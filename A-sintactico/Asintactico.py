@@ -4,9 +4,12 @@ with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
     
 programa = """
-   numero = 2;
+  if(TRUE){
+    int edad;
+  };
 """
 
-parser = Lark(grammar, parser='lalr')
+parser = Lark(grammar, parser='lalr', lexer='contextual', maybe_placeholders=False)
+
 tree = parser.parse(programa)
 print(tree.pretty())

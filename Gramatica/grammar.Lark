@@ -1,45 +1,49 @@
 start: instruccion+
-instruccion: ciclo
-            | declararVariable 
-            | decision 
-            | asignacion 
-            | impresion
+instruccion: impresion | declarar | asignacion ";" | decision | ciclo
+ 
+//repeticion
+ciclo: forloop | whileloop | dowhile 
+forloop: "for" "(" asignacion ";" condicion ";" asignacion ")" bloque ";"
+whileloop: "while" "(" condicion ")" bloque ";" 
+dowhile: "do" bloque "while" "(" condicion ")" ";" 
 
-impresion: PRINT expresion ";"
+//aqui se declara el if
+decision: ifstatement
+ifstatement: "if" "(" (condicion|BOOL)")" bloque elifparte? elseparte? ";" 
+elifparte: ("elif" "(" (condicion|BOOL) ")" bloque)* 
+elseparte: "else" bloque 
 
-ciclo: forLoop | whileLoop | doWhile 
-forLoop: "for" "(" asignacion ";" condicion ";" asignacion ")" bloque ";"
-whileLoop: "while" "(" condicion ")" bloque ";" 
-doWhile: "do" bloque "while" "(" condicion ")" ";" 
+condicion: termino((OPERADORCOMP | OPERADORLOG)termino)* 
+bloque: "{" start "}" 
+//
 
-decision: ifStatement
-ifStatement: "if" "(" condicion ")" bloque elifParte? elseParte? ";" 
-elifParte: ("elif" "(" condicion ")" bloque)* 
-elseParte: "else" bloque 
+//se declara varibales y se inicializa
+declarar: TIPOVARIABLE VARNAME ("=" valor)? ";"
 
-condicion: termino ( (OPERADORLOG | OPERADORCOMP) termino )* | BOOL
-asignacion: nombreVariable "=" termino ";" 
-bloque: "{" instruccion+ "}" 
-declararVariable: tipoVariable nombreVariable ";"
+//se imprime 
+impresion: PRINT "(" expresion ")" ";"
 
-nombreVariable: VARNAME                              
-valor: typeData                                       
-termino: nombreVariable | valor | "(" expresion ")"
-expresion: termino ( OPERADOR termino )*
+//asignacion entre variables y expresion
+asignacion: VARNAME "=" expresion 
 
-typeData: STRING | FLOAT | INT | BOOL
-STRING: /"[^"\n]*"/
-FLOAT: /[0-9]+\.[0-9]+/
-INT: /[0-9]+/
+//se define una expresion, termino y los valores
+expresion: termino (OPERADOR termino)*
+termino: VARNAME | valor | "(" expresion ")"
+valor: INT | FLOAT | BOOL | STRING
+
+//objetos terminales
+TIPOVARIABLE: "int" | "float" | "string" | "bool"
+PRINT: "out"
 BOOL: "TRUE" | "FALSE"
-VARNAME: /[a-zA-Z_][a-zA-Z0-9_]*/
 OPERADOR: "+" | "-" | "*" | "/"
 OPERADORCOMP: ">=" | "<=" | "==" | "!=" | "<" | ">"
 OPERADORLOG: "&&" | "||" | "AND" | "OR"
 
-PRINT: "out"
-Comentario: \/\*[\s\S]*?\*\/ 
-     
-%ignore Comentario
+STRING: /"[^"\n]*"/
+FLOAT: /[0-9]+\.[0-9]+/
+INT: /[0-9]+/
+
+VARNAME: /(?!int|float|string|bool|AND|OR|TRUE|FALSE)[a-zA-Z_][a-zA-Z0-9_]*/
+
 %import common.WS
 %ignore WS
