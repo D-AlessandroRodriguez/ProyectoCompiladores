@@ -1,6 +1,6 @@
-from lark import Lark
 
 # Gramática sencilla para sumas
+from lark import Lark
 grammar = """
     start: expr
     expr: expr "+" NUMBER  -> add
@@ -8,7 +8,8 @@ grammar = """
     %import common.NUMBER
     %import common.WS      
     %ignore WS             
-"""
+"""         
+
 """
 <suma>::- <num> <ope><num
 <num>::- 1|2|3|4
