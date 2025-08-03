@@ -4,9 +4,7 @@ with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
     
 programa = """
-  if(TRUE){
-    int edad;
-  };
+  int edad = 1;
 """
 
 parser = Lark(grammar, parser='lalr', lexer='contextual', maybe_placeholders=False)
