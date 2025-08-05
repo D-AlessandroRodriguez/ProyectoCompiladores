@@ -20,10 +20,27 @@ class T(Transformer):
         return valor[0]
     
     def impresion(self, valor):
-        return f"Imprimir: {valor[0]}"
+        
+        print = valor[0]
+        expresion = valor[1]
+        #impresion: PRINT "(" expresion ")" ";"
+        return f"Impresion: {expresion}"
     
     def declarar(self, valor):
-        return f"Declarar: {valor[0]} = {valor[1]}"
+        tipovariable= valor[0]
+        varname = valor[1]
+
+        #Si hay un valor, lo asigno
+        if len(valor) > 2:
+            variable = valor[2]
+        else:
+            valor = None    
+        
+        #Si hay un valor, lo imprimo
+        if variable is None:
+          return f"Declara: {tipovariable} {varname}"
+        else:
+          return f"Declara: {tipovariable} {varname} = {variable}"
     
     def asignacion(self, valor):
         #Se lee de izq a der
