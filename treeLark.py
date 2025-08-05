@@ -2,16 +2,19 @@
 # Gramática sencilla para sumas
 from lark import Lark, Transformer
 
+# Definición de la clase Transformer
 class T(Transformer):
-    def NUMBER(self, tok):
-        return int(tok)
-    def expr(self, items):
-        return items[0]
-    def add(self, items):
-        left, right = items
+    # Métodos para transformar los nodos del árbol
+    # Cada método corresponde a una regla de la gramática
+    def NUMBER(self, valor):
+        return int(valor)
+    def expr(self, valor):
+        return valor[0]
+    def add(self, valor):
+        left, right = valor
         return left + right
-    def start(self, items):
-        return items[0]
+    def start(self, valor):
+        return valor[0]
         
 
 
@@ -35,7 +38,7 @@ parser = Lark(grammar, parser='lalr')
 suma = "3 + 5"
 
 # Analizar una expresión
-tree = parser.parse("3 + 5")
+tree = parser.parse(suma)
 print(tree.pretty())  # Imprime el árbol
 
 
