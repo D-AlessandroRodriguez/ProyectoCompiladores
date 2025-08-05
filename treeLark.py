@@ -32,6 +32,7 @@ grammar = """
 # Crear el parser
 parser = Lark(grammar, parser='lalr')
 
+suma = "3 + 5"
 
 # Analizar una expresión
 tree = parser.parse("3 + 5")
@@ -41,7 +42,7 @@ print(tree.pretty())  # Imprime el árbol
 #Crear transformer
 trans = Lark(grammar, parser='lalr',transformer=T())
 # Transformar el árbol
-resultado = trans.parse("3 + 5")
+resultado = trans.parse(suma)
 
 print("Resultado:", resultado)  # Imprime: Resultado: 8
 
