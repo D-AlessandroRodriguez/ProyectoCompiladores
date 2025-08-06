@@ -14,7 +14,7 @@ class T(Transformer):
     def booleano(self, valor):
         return valor[0] == "TRUE"
     def cadena(self, valor):
-        return tipo(valor[0][1:-1])  # Eliminar comillas
+        return str(valor[0][1:-1])  # Eliminar comillas
     def nombre(self, valor):
       nombre = str(valor[0])
       return self.variables.get(nombre, nombre)
