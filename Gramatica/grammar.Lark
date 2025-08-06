@@ -1,5 +1,5 @@
-start: instruccion+
-instruccion: impresion | declarar | asignacion ";" | decision | ciclo
+?start: instruccion+
+?instruccion: impresion | declarar | asignacion ";" | decision | ciclo
  
 //repeticion
 ciclo: forloop | whileloop | dowhile 
@@ -9,7 +9,7 @@ dowhile: "do" bloque "while" "(" condicion ")" ";"
 
 //aqui se declara el if
 decision: ifstatement
-ifstatement: "if" "(" (condicion|BOOL)")" bloque elifparte? elseparte? ";" 
+!ifstatement: "if" "(" (condicion|BOOL)")" bloque elifparte? elseparte? ";" 
 elifparte: ("elif" "(" (condicion|BOOL) ")" bloque)* 
 elseparte: "else" bloque 
 
@@ -28,8 +28,8 @@ asignacion: VARNAME "=" expresion
 
 //se define una expresion, termino y los valores
 expresion: termino (OPERADOR termino)*
-termino: VARNAME | valor | "(" expresion ")"
-valor: INT | FLOAT | BOOL | STRING
+?termino: VARNAME | valor | "(" expresion ")"
+valor: INT -> entero | FLOAT -> decimal | BOOL -> booleano | STRING -> cadena
 
 //objetos terminales
 TIPOVARIABLE: "int" | "float" | "string" | "bool"

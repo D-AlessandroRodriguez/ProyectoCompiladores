@@ -71,6 +71,9 @@ with open('../Gramatica/grammar.Lark', 'r') as f:
     
 programa = """
   int edad = 1;
+  if (edad == 1) {
+    out(" hola mundo ");
+  };
 """
 
 
