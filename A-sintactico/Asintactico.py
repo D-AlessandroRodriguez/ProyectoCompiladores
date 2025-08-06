@@ -7,25 +7,29 @@ class T(Transformer):
     # Cada método corresponde a una regla de la gramática
 
     #//////////Extras////////////
-    def NUMBER(self, valor):
-        return int(valor)
-    
-    def expr(self, valor):
-        return valor[0]
-    
-    def add(self, valor):
-        left, right = valor
-        return left + right
-    def varname(self, valor):
+    def entero(self, valor):
+        return int(valor[0])
+    def decimal(self, valor):
+        return float(valor[0])
+    def booleano(self, valor):
+        return valor[0] == "TRUE"
+    def cadena(self, valor):
+        return tipo(valor[0][1:-1])  # Eliminar comillas
+    def nombre(self, valor):
       nombre = str(valor[0])
-      return self.variables.get(nombre, 0)
-
+      return self.variables.get(nombre, nombre)
+    def bloque(self, valor):
+        return valor
+    def termino(self, valor):
+       return valor[0]
     # /////////////////////////
 
 
     #///////////// Métodos para manejar la gramática/////////
     def start(self, valor):
-        return valor
+         for instruccion in valor:
+            if instruccion is not None:
+                instruccion  # Ejecutar cada instrucción
   
     def instruccion(self, valor):
         return valor[0]
@@ -36,16 +40,16 @@ class T(Transformer):
         return None
     
     def declarar(self, valor):
-        tipovariable= valor[0]
-        varname = valor[1]
+        tipo= valor[0]
+        nombre = valor[1]
 
         #Si hay un valor, lo asigno
         if len(valor) > 2:
             variable = valor[2]
         else:
-            valor = None    
+            variable = None    
 
-        self.variables[nombre] = valor
+        self.variables[nombre] = variable
         return None
         
     
@@ -58,11 +62,11 @@ class T(Transformer):
         return None
     
     def decision(self, valor):
-      return valor[0]
+        return valor[0]
     
        
     def ciclo(self, valor):
-      return valor[0]
+        return valor[0]
     
     #////////////////////////////////////////////////////
 
@@ -91,16 +95,16 @@ class T(Transformer):
                 instruccion
       return None
     
-    def elifparte(self, items):
+    def elifparte(self, valor):
         resultado = []
-        for i in range(0, len(items), 2):
-            condicion = items[i]
-            bloque = items[i + 1]
+        for i in range(0, len(valor), 2):
+            condicion = valor[i]
+            bloque = valor[i + 1]
             resultado.append((condicion, bloque))
         return resultado
 
-    def elseparte(self, items):
-        return items[0]  
+    def elseparte(self, valor):
+        return valor[0]  
   #//////////////////////////////////////////////////////////////
 
 
@@ -136,8 +140,49 @@ class T(Transformer):
                 break
       return None
     
-# /////////////////////////////////////////////////////////////
 
+# ////////////////Metodos de condiciones y operaciones logicas////////////////
+    def condicion(self, valor):
+        resultado = valor[0]
+        i = 1
+        while i < len(valor):
+            operador = valor[i]
+            derecho = valor[i + 1]
+            if operador == "==":
+                resultado = resultado == derecho
+            elif operador == "!=":
+                resultado = resultado != derecho
+            elif operador == "<":
+                resultado = resultado < derecho
+            elif operador == ">":
+                resultado = resultado > derecho
+            elif operador == "<=":
+                resultado = resultado <= derecho
+            elif operador == ">=":
+                resultado = resultado >= derecho
+            elif operador in ("&&", "AND"):
+                resultado = resultado and derecho
+            elif operador in ("||", "OR"):
+                resultado = resultado or derecho
+            i += 2
+        return resultado
+
+    def expresion(self, valor):
+        resultado = valor[0]
+        for i in range(1, len(valor), 2):
+            operador = valor[i]
+            termino = valor[i + 1]
+            if operador == "+":
+                resultado = resultado + termino
+            elif operador == "-":
+                resultado = resultado - termino
+            elif operador == "*":
+                resultado = resultado * termino
+            elif operador == "/":
+                resultado = resultado / termino
+        return resultado
+
+# //////////////////////////////////////////////////////////////
 
 
 
