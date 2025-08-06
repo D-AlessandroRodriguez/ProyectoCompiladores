@@ -1,6 +1,8 @@
 from lark import Lark, Transformer
 
 class T(Transformer):
+    def __init__(self):
+        self.variables = {}
     # Métodos para transformar los nodos del árbol
     # Cada método corresponde a una regla de la gramática
     def NUMBER(self, valor):
@@ -14,7 +16,7 @@ class T(Transformer):
         return left + right
     
     def start(self, valor):
-        return valor[0] 
+        return valor
   
     def instruccion(self, valor):
         return valor[0]
@@ -51,17 +53,55 @@ class T(Transformer):
         return f"Asignar: {variable} = {expresion}"
     
     def decision(self, valor):
-        #Se lee de arriba hacia abajo
-        ifstatement = valor[0]
-        condicion = valor[1]
-        bloque = valor[2]
-        elifparte = valor[3] if len(valor) > 3 else []
-        elseparte = valor[4] if len(valor) > 4 else None
-        return f"Decisión: {ifstatement} {condicion} {bloque}"
-        #Tengo que ver como se manejan los bloques de codigo con elif y else
+      return valor[0]
+    
+    def ifstatement(self, valor):
+      condicion = valor[0]
+      bloque_if = valor[1]
+      elifparte = valor[2] if len(valor) > 2 else []
+      elseparte = valor[3] if len(valor) > 3 else None
+
+      resultado = f"If: {condicion} -> {bloque_if}"
+
+      if elifparte:
+          resultado += f"\nElif: {elifparte}"
+      if elseparte:
+          resultado += f"\nElse: {elseparte}"
+      
+      return resultado
+    
+    def elifparte(self, items):
+        resultado = []
+        for i in range(0, len(items), 2):
+            condicion = items[i]
+            bloque = items[i + 1]
+            resultado.append((condicion, bloque))
+        return resultado
+
+    def elseparte(self, items):
+        return items[0]  
+
     
     def ciclo(self, valor):
-        return f"Ciclo: {valor[0]} {valor[1]} {valor[2]}"
+      return valor[0]
+
+    def forloop(self, valor):
+      inicio = valor[0]
+      condicion = valor[1]
+      incremento = valor[2]
+      bloque = valor[3]
+      return f"For loop: {inicio}; {condicion}; {incremento} -> {bloque}"
+
+    def whileloop(self, valor):
+      condicion = valor[0]
+      bloque = valor[1]
+      return f"While loop: {condicion} -> {bloque}"
+
+    def dowhile(self, valor):
+      bloque = valor[0]
+      condicion = valor[1]
+      return f"Do-While loop: {bloque} while ({condicion})"
+
 
 
 
