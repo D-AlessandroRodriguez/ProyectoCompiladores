@@ -5,6 +5,8 @@ class T(Transformer):
         self.variables = {}
     # Métodos para transformar los nodos del árbol
     # Cada método corresponde a una regla de la gramática
+
+    #//////////Extras////////////
     def NUMBER(self, valor):
         return int(valor)
     
@@ -14,7 +16,10 @@ class T(Transformer):
     def add(self, valor):
         left, right = valor
         return left + right
-    
+    # /////////////////////////
+
+
+    #///////////// Métodos para manejar la gramática/////////
     def start(self, valor):
         return valor
   
@@ -55,6 +60,15 @@ class T(Transformer):
     def decision(self, valor):
       return valor[0]
     
+       
+    def ciclo(self, valor):
+      return valor[0]
+    
+    #////////////////////////////////////////////////////
+
+    
+    
+    # /////////////Métodos para manejar decisiones ////////////////
     def ifstatement(self, valor):
       condicion = valor[0]
       bloque_if = valor[1]
@@ -80,11 +94,10 @@ class T(Transformer):
 
     def elseparte(self, items):
         return items[0]  
+  #//////////////////////////////////////////////////////////////
 
-    
-    def ciclo(self, valor):
-      return valor[0]
 
+  # //////////////Métodos para manejar ciclos///////////////////
     def forloop(self, valor):
       inicio = valor[0]
       condicion = valor[1]
@@ -101,7 +114,8 @@ class T(Transformer):
       bloque = valor[0]
       condicion = valor[1]
       return f"Do-While loop: {bloque} while ({condicion})"
-
+    
+# /////////////////////////////////////////////////////////////
 
 
 
