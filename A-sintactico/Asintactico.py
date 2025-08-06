@@ -16,6 +16,10 @@ class T(Transformer):
     def add(self, valor):
         left, right = valor
         return left + right
+    def varname(self, valor):
+      nombre = str(valor[0])
+      return self.variables.get(nombre, 0)
+
     # /////////////////////////
 
 
@@ -27,11 +31,9 @@ class T(Transformer):
         return valor[0]
     
     def impresion(self, valor):
-        
-        print = valor[0]
-        expresion = valor[1]
-        #impresion: PRINT "(" expresion ")" ";"
-        return f"Impresion: {expresion}"
+        expresion = valor[0]
+        print (expresion)
+        return None
     
     def declarar(self, valor):
         tipovariable= valor[0]
@@ -42,12 +44,10 @@ class T(Transformer):
             variable = valor[2]
         else:
             valor = None    
+
+        self.variables[nombre] = valor
+        return None
         
-        #Si hay un valor, lo imprimo
-        if variable is None:
-          return f"Declara: {tipovariable} {varname}"
-        else:
-          return f"Declara: {tipovariable} {varname} = {variable}"
     
     def asignacion(self, valor):
         #Se lee de izq a der
@@ -55,7 +55,7 @@ class T(Transformer):
         expresion = valor[1]
         #Creo un diccionario para almacenar las variables y sus valores
         self.variables[variable] = expresion
-        return f"Asignar: {variable} = {expresion}"
+        return None
     
     def decision(self, valor):
       return valor[0]
@@ -66,7 +66,7 @@ class T(Transformer):
     
     #////////////////////////////////////////////////////
 
-    
+
     
     # /////////////Métodos para manejar decisiones ////////////////
     def ifstatement(self, valor):
@@ -75,14 +75,21 @@ class T(Transformer):
       elifparte = valor[2] if len(valor) > 2 else []
       elseparte = valor[3] if len(valor) > 3 else None
 
-      resultado = f"If: {condicion} -> {bloque_if}"
-
-      if elifparte:
-          resultado += f"\nElif: {elifparte}"
-      if elseparte:
-          resultado += f"\nElse: {elseparte}"
-      
-      return resultado
+      if condicion:
+        for instruccion in bloque_if:
+            instruccion
+      else:
+        ejecutado = False
+        for cond, bloque in elifparte:
+            if cond:
+                for instruccion in bloque:
+                    instruccion
+                ejecutado = True
+                break
+        if not ejecutado and elseparte:
+            for instruccion in elseparte:
+                instruccion
+      return None
     
     def elifparte(self, items):
         resultado = []
@@ -103,17 +110,31 @@ class T(Transformer):
       condicion = valor[1]
       incremento = valor[2]
       bloque = valor[3]
-      return f"For loop: {inicio}; {condicion}; {incremento} -> {bloque}"
+      while condicion:
+            for instruccion in bloque:
+                instruccion
+            incremento
+            condicion = valor[1]  # reevaluar condición
+      return None
 
     def whileloop(self, valor):
       condicion = valor[0]
       bloque = valor[1]
-      return f"While loop: {condicion} -> {bloque}"
+      while condicion:
+            for instruccion in bloque:
+                instruccion
+            condicion = val[0]  # reevaluar condición
+      return None
 
     def dowhile(self, valor):
       bloque = valor[0]
       condicion = valor[1]
-      return f"Do-While loop: {bloque} while ({condicion})"
+      while True:
+            for instruccion in bloque:
+                instruccion
+            if not condicion:
+                break
+      return None
     
 # /////////////////////////////////////////////////////////////
 
