@@ -1,0 +1,69 @@
+int num = 3; 
+int num2 = 5; 
+string word1 = "hola "; 
+string word2 = " mundo "; 
+string word3 = "hola mundo ";  
+
+if(num < num2){ 
+     out(word1);  
+} elif(num == num2){ 
+     out(word2);  
+} else { 
+     out(word3);  
+}; $ 
+
+bool seguir = TRUE; 
+int i = 0; 
+
+for(i = 0; i < 3; i = i + 1){ 
+
+        out(“ número " + i); 
+
+}; $ 
+  
+int contador = 0; 
+bool activo = TRUE; 
+
+while(activo){ 
+
+        out("Contador: " + contador);
+        contador = contador + 1; 
+        if(contador >= 5){ 
+            activo = FALSE;  
+        }; 
+
+};$ 
+
+  
+
+int x = 0; 
+bool repetir = TRUE; 
+
+do { 
+
+        out("Valor de x: " + x); 
+        x = x + 1; 
+        if(x >= 2){ 
+             repetir = FALSE;  
+
+        }; 
+} while(repetir); $ 
+
+  
+
+int edad = 17; 
+bool esMayor = FALSE; 
+
+if(edad >= 18){ 
+    esMayor = TRUE;  
+} else { 
+    esMayor = FALSE;  
+}; 
+
+  
+
+if(esMayor){ 
+    out("Es mayor de edad.");  
+} else { 
+   out("Es menor de edad.");  
+}; $
