@@ -8,20 +8,22 @@ class T(Transformer):
 
     #//////////Extras////////////
     def entero(self, valor):
-        return int(valor[0])
+        return int(valor)
     def decimal(self, valor):
-        return float(valor[0])
+        return float(valor)
     def booleano(self, valor):
-        return valor[0] == "TRUE"
+        return valor == "TRUE"
     def cadena(self, valor):
-        return str(valor[0][1:-1])  # Eliminar comillas
-    def nombre(self, valor):
-      nombre = str(valor[0])
-      return self.variables.get(nombre, nombre)
+        return str(valor[1:-1])  # Eliminar comillas
+    def VARNAME(self, valor):
+        nombre = str(valor)
+        if nombre not in self.variables: # Si la variable no está definida, lanza una excepción 
+            raise Exception(f"Variable '{nombre}' no definida")
+        return self.variables[nombre]
     def bloque(self, valor):
         return valor
     def termino(self, valor):
-       return valor[0]
+       return valor
     # /////////////////////////
 
 

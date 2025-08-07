@@ -29,7 +29,7 @@ doWhile: do
 
 Impresión y comentarios:
 Impresión: out
-Comentario: \/\*[\s\S]*?\*\/      o        \/\*.*?\*\/ si usamos re.DOTALL
+Comentario: \/\*([\s\S]*?)\*\/      o        \/\*.*?\*\/ si usamos re.DOTALL
 
 
  

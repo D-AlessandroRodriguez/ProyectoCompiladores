@@ -6,16 +6,12 @@ with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
     
 programa = """
-    int contador = 0; 
-    bool activo = TRUE; 
-
-    while(activo){ 
-        out("Contador: " + contador);
-        contador = contador + 1; 
-        if(contador >= 5){ 
-            activo = FALSE;  
-        }; 
+    /* esto es un comentario */
+    int edad = 1;
+    if (edad == 1) {
+        out("hola mundo");
     };
+
 """
 
 
