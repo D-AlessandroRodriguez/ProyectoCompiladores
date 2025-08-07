@@ -1,4 +1,4 @@
-from lark import Lark, Transformer
+from lark import Lark, Transformer, Token
 
 class T(Transformer):
     def __init__(self):
@@ -19,6 +19,7 @@ class T(Transformer):
         nombre = str(valor[0])
         return self.variables.get(nombre, nombre)
     def bloque(self, valor):
+        print("DEBUG - BLOQUE: ", valor)
         return valor
     def termino(self, valor):
        return valor[0]
@@ -27,16 +28,19 @@ class T(Transformer):
 
     #///////////// Métodos para manejar la gramática/////////
     def start(self, valor):
-         for instruccion in valor:
-            if instruccion is not None:
-                instruccion  # Ejecutar cada instrucción
+        print("DEBUG - START: ", valor)
+        return valor
+        
   
     def instruccion(self, valor):
+        print("INSTRUCCION: ", valor)
+        if valor[0] is None:
+            print("DEBUG - instrucción inválida:", valor)
         return valor[0]
     
     def impresion(self, valor):
-        print (valor[1])
-        return None
+        Impresion(valor[0]) # envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
+        #print(valor[0])
     
     def declarar(self, valor):
         tipo= valor[0]
@@ -75,39 +79,46 @@ class T(Transformer):
     def ifstatement(self, valor):
       print("DEBUG - valor: ", valor)
       condicion = valor[0]
-      print("DEBUG - condicion:", valor[0])
       bloque_if = valor[1]
-      print("DEBUG - bloque_if:", valor[1])
-      elifparte = valor[2] if len(valor) > 2 else []
-      print("DEBUG - elif:", valor[2])
-      elseparte = valor[3] if len(valor) > 3 else None
-      print("DEBUG - else:", valor[3])
+      elifparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
+      elseparte = valor[3] if len(valor) > 3 and valor[3] is not None else []
       
       if condicion:
         for instruccion in bloque_if:
-            instruccion
+            print("DEBUG - instruccion: ", instruccion)
+            if instruccion is not None:
+                print("DEBUG - si llegamos al if")
+                instruccion.ejecutar() #nos debería llevar a la funcion ejecutar de Impresion
+            else:
+                print("DEBUG - instrucción None dentro del if")
       else:
         ejecutado = False
         for cond, bloque in elifparte:
             if cond:
                 for instruccion in bloque:
-                    instruccion
+                    instruccion.ejecutar()
                 ejecutado = True
                 break
         if not ejecutado and elseparte:
             for instruccion in elseparte:
-                instruccion
+                instruccion.ejecutar()
       return None
     
     def elifparte(self, valor):
+        if not valor: # evitamos que guarde NONE y en cambio envíe una lista vacía
+            print("DEBUG - ELIF: ", valor)
+            return []
         resultado = []
         for i in range(0, len(valor), 2):
             condicion = valor[i]
             bloque = valor[i + 1]
             resultado.append((condicion, bloque))
+        print("DEBUG - ELIF del for: ", valor)
         return resultado
 
     def elseparte(self, valor):
+        if not valor or valor[0] is None: #evitamos que guarde NONE y en cambio envíe una lista vacía
+            return []
         return valor[0]  
   #//////////////////////////////////////////////////////////////
 
@@ -147,7 +158,13 @@ class T(Transformer):
 
 # ////////////////Metodos de condiciones y operaciones logicas////////////////
     def condicion(self, valor):
-        resultado = valor[0]
+        def evaluar(v):
+            if isinstance(v, Token):
+                nombre = str(v)
+                return self.variables.get(nombre, nombre)
+            return v
+
+        resultado = evaluar(valor[0])
         i = 1
         while i < len(valor):
             operador = valor[i]
@@ -188,6 +205,13 @@ class T(Transformer):
 
 # //////////////////////////////////////////////////////////////
 
+class Impresion:
+    def __init__(self, valor):
+        self.valor = valor
+    def ejecutar(self):
+        print(self.valor)
+
+
 
 with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
@@ -198,14 +222,19 @@ with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
 
 programa = """
     /* esto es un comentario */
-    int edad = 122;
-    if (edad == 1) {
-        out("hola mundo");
-    };
+    int edad = 17; 
+    bool esMayor = FALSE; 
 
+    if(edad >= 18){ 
+        esMayor = TRUE;  
+        out("no se imprime");
+    } else { 
+        esMayor = FALSE;  
+        out("sí se imprime");
+    }; 
 """
 
 #Crear transformer
-trans = Lark(grammar, parser='lalr',transformer=T())
+trans = Lark(grammar, parser='lalr', transformer=T())
 # Transformar el árbol
 trans.parse(programa)
