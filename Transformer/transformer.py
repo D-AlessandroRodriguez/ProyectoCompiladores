@@ -16,7 +16,8 @@ class T(Transformer):
     def cadena(self, valor):
         return str(valor[0][1:-1])  # Eliminar comillas
     def VARNAME(self, valor):
-        return str(valor)
+        nombre = str(valor[0])
+        return self.variables.get(nombre, nombre)
     def bloque(self, valor):
         return valor
     def termino(self, valor):
@@ -72,11 +73,16 @@ class T(Transformer):
     
     # /////////////Métodos para manejar decisiones ////////////////
     def ifstatement(self, valor):
+      print("DEBUG - valor: ", valor)
       condicion = valor[0]
+      print("DEBUG - condicion:", valor[0])
       bloque_if = valor[1]
+      print("DEBUG - bloque_if:", valor[1])
       elifparte = valor[2] if len(valor) > 2 else []
+      print("DEBUG - elif:", valor[2])
       elseparte = valor[3] if len(valor) > 3 else None
-
+      print("DEBUG - else:", valor[3])
+      
       if condicion:
         for instruccion in bloque_if:
             instruccion
