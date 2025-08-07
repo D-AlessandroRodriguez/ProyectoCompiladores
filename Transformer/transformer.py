@@ -8,22 +8,19 @@ class T(Transformer):
 
     #//////////Extras////////////
     def entero(self, valor):
-        return int(valor)
+        return int(valor[0])
     def decimal(self, valor):
-        return float(valor)
+        return float(valor[0])
     def booleano(self, valor):
-        return valor == "TRUE"
+        return valor[0] == "TRUE"
     def cadena(self, valor):
-        return str(valor[1:-1])  # Eliminar comillas
+        return str(valor[0][1:-1])  # Eliminar comillas
     def VARNAME(self, valor):
-        nombre = str(valor)
-        if nombre not in self.variables: # Si la variable no está definida, lanza una excepción 
-            raise Exception(f"Variable '{nombre}' no definida")
-        return self.variables[nombre]
+        return str(valor)
     def bloque(self, valor):
         return valor
     def termino(self, valor):
-       return valor
+       return valor[0]
     # /////////////////////////
 
 
@@ -37,8 +34,7 @@ class T(Transformer):
         return valor[0]
     
     def impresion(self, valor):
-        expresion = valor[0]
-        print (expresion)
+        print (valor[1])
         return None
     
     def declarar(self, valor):
@@ -189,9 +185,19 @@ class T(Transformer):
 
 with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
-
+"""
 with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
     programa = d.read()
+"""
+
+programa = """
+    /* esto es un comentario */
+    int edad = 122;
+    if (edad == 1) {
+        out("hola mundo");
+    };
+
+"""
 
 #Crear transformer
 trans = Lark(grammar, parser='lalr',transformer=T())
