@@ -125,7 +125,7 @@ class T(Transformer):
       while condicion:
             for instruccion in bloque:
                 instruccion
-            condicion = val[0]  # reevaluar condición
+            condicion = valor[0]  # reevaluar condición
       return None
 
     def dowhile(self, valor):
