@@ -1,4 +1,5 @@
 from lark import Lark, Transformer, Token
+import re
 # self.variables.get(nombre, nombre)
 
 class T(Transformer):
@@ -50,7 +51,10 @@ class T(Transformer):
             if(valor[0] in self.variables) :
              print(self.variables[valor[0]])
             else :
-             print(valor[0].replace('"', ''))
+                if isinstance(valor[0], str):
+                    print(valor[0].replace('"', ''))
+                else:
+                    print(valor[0])
         except KeyError:
             print("La variable no ha sido declarada")
 
@@ -222,23 +226,21 @@ class T(Transformer):
             if operador == "+":
                 counter = 0
                 for val in valor:
-                    if isinstance(val, str) or val in self.variables:
+                    if re.fullmatch(r"\d+", str(val)) or re.fullmatch(r"\+", str(val)):
                         counter = counter + 1
                     else:
                         continue
                 
-                if (counter >= 1):
+                if (counter != len(valor)):
                     # valor tiene almacenado: [val1, "+", val2, "+", val3, ...]
                     resultado = ""        
                     for val in valor:
-                        #if val == "+":  # ignoramos el operador
-                        #    continue
-                        # Si es nombre de variable, obtener su valor
                         if isinstance(val, str) and val in self.variables:
                             val = self.variables[val]
                         elif(val == "+"):
                             continue
                         resultado += str(val)  # forzamos a string para concatenar
+
                 else:
                     resultado = resultado + termino
             elif operador == "-":
@@ -277,14 +279,15 @@ with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
 """
 
 programa = """
-     /* esto es un comentario */
+    /* esto es un comentario */
     string nombre = "mundo";
     string saludo = 1 + 3 + 4 + 5 + 6 + "Hola " + nombre + " feliz noche" ;
     out(saludo);
     out(1+2);
     out("Hola " + nombre + " feliz noche");
-    int edad = 33;
+    int edad = 3 + 1 + 3;
     out(edad);
+    out(1112);
 """
 
 #Crear transformer
