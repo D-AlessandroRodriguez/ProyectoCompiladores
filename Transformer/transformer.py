@@ -1,5 +1,6 @@
 from lark import Lark, Transformer, Token
 # self.variables.get(nombre, nombre)
+
 class T(Transformer):
     def __init__(self):
         super(). __init__()
@@ -18,7 +19,7 @@ class T(Transformer):
         return valor[0] == "TRUE"
     
     def cadena(self, valor):
-        return str(valor[0][1:-1])  # Eliminar comillas
+        return str(valor[0])  # Eliminar comillas [1:-1]
     
     def VARNAME(self, valor):
         nombre = str(valor)
@@ -45,7 +46,8 @@ class T(Transformer):
     
     def impresion(self, valor):
         try:
-            print(self.variables[valor[0]], end=" ")
+            print("\"cesar\"".split("\"").len())
+            print(self.variables[valor[0]])
         except KeyError:
             print("La variable no ha sido declarada")
 
@@ -56,7 +58,7 @@ class T(Transformer):
     def declarar(self, valor):
         tipo= valor[0]
         nombre = valor[1]
-
+        
         #print(valor)
         #Si hay un valor, lo asigno
         if len(valor) > 2:
@@ -78,6 +80,7 @@ class T(Transformer):
         self.variables[variable] = expresion
         return valor
     
+    #///////////////////////////////hasta aqui funciona
     def decision(self, valor):
         print(valor)
         return valor[0]
@@ -178,7 +181,8 @@ class T(Transformer):
                 return self.variables.get(nombre, nombre)
             return v
 
-        resultado = evaluar(valor[0])
+        resultado = evaluar(self.variables[valor[0]])
+
         i = 1
         while i < len(valor):
             operador = valor[i]
@@ -237,12 +241,10 @@ with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
 programa = """
     /* esto es un comentario */
     int edad = 17; 
-    bool esMayor = FALSE; out(esMayor);
+    bool esMayor = FALSE;
+    string name = "cesar";
 
-    if(edad >= 18){ 
-        esMayor = TRUE;  
-        out("no se imprime");
-    };
+    out("name");
 """
 
 #Crear transformer
