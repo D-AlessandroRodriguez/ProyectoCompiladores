@@ -1,69 +1,15 @@
-int num = 3; 
-int num2 = 5; 
-string word1 = "hola "; 
-string word2 = " mundo "; 
-string word3 = "hola mundo ";  
+    /* esto es un comentario */
+    string nombre = "mundo";
+    string saludo = 1 + 3 + 4 + 5 + 6 + "Hola " + nombre + " feliz noche" ;
+    out(saludo);
+    out(1+2);
+    out("Hola " + nombre + " feliz noche");
+    int edad = 3 + 1 + 3;
+    out(edad);
+    out(1112);
 
-if(num < num2){ 
-     out(word1);  
-} elif(num == num2){ 
-     out(word2);  
-} else { 
-     out(word3);  
-}; $ 
-
-bool seguir = TRUE; 
-int i = 0; 
-
-for(i = 0; i < 3; i = i + 1){ 
-
-        out(“ número " + i); 
-
-}; $ 
-  
-int contador = 0; 
-bool activo = TRUE; 
-
-while(activo){ 
-
-        out("Contador: " + contador);
-        contador = contador + 1; 
-        if(contador >= 5){ 
-            activo = FALSE;  
-        }; 
-
-};$ 
-
-  
-
-int x = 0; 
-bool repetir = TRUE; 
-
-do { 
-
-        out("Valor de x: " + x); 
-        x = x + 1; 
-        if(x >= 2){ 
-             repetir = FALSE;  
-
-        }; 
-} while(repetir); $ 
-
-  
-
-int edad = 17; 
-bool esMayor = FALSE; 
-
-if(edad >= 18){ 
-    esMayor = TRUE;  
-} else { 
-    esMayor = FALSE;  
-}; 
-
-  
-
-if(esMayor){ 
-    out("Es mayor de edad.");  
-} else { 
-   out("Es menor de edad.");  
-}; $
+    if(1<2){
+        out("no debe entrar");
+    }else{
+        out("si entre");
+    };

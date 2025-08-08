@@ -1,6 +1,5 @@
 from lark import Lark, Transformer, Token
 import re
-# self.variables.get(nombre, nombre)
 
 class T(Transformer):
     def __init__(self):
@@ -51,13 +50,15 @@ class T(Transformer):
             valor[0].ejecutar()  # Las diferidas no se ejecutarán aquí
         return valor[0]
     
+    def TREE(self, valor):
+        print(valor)
+
     def impresion(self, valor):
             try:
              if(valor[0] in self.variables):
                 print("1", self.variables[valor[0]])
              elif(not isinstance(valor[0], (int,float))):
-                if self.esta_dentro_de_if:
-                    print("2", valor[0].replace('"', ''))
+                print("2", valor[0].replace('"', ''))
              else :
                 if isinstance(valor[0], str):
                     print("3", valor[0].replace('"', ''))
@@ -65,7 +66,7 @@ class T(Transformer):
                     print("4", valor[0])
             except KeyError:
                 print("La variable no ha sido declarada")
-            return Impresion(valor[0], self.variables)
+            return Impresion(valor[0], self.variables, self.esta_dentro_de_if)
         
         #print("IMPRESION: ", valor[0])
         #return Impresion(valor[0]) #envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
@@ -125,14 +126,15 @@ class T(Transformer):
       condicion = valor[0]
       self.esta_dentro_de_if = True
       bloque_if = valor[1]
-      elifparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
-      elseparte = valor[3] if len(valor) > 3 and valor[3] is not None else []
+      elseparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
+      # elifparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
+      # elseparte = valor[3] if len(valor) > 3 and valor[3] is not None else []
       
 
       if bool(condicion):
-        print("DEBUG - TRUE")
+        #print("DEBUG - TRUE")
         for instruccion in bloque_if:
-            print("DEBUG - instruccion: ", instruccion)
+           # print("DEBUG - instruccion: ", instruccion)
             if instruccion is not None:
                 #print("DEBUG - si llegamos al if")
                 #nos debería llevar a la funcion ejecutar de Impresion
@@ -140,17 +142,9 @@ class T(Transformer):
             else:
                 print("DEBUG - instrucción None dentro del if")
       else:
-        print("DEBUG - FALSE")
-        ejecutado = False
-        for cond, bloque in elifparte:
-            if cond:
-                for instruccion in bloque:
-                    instruccion.ejecutar()
-                ejecutado = True
-                break
-        if not ejecutado and elseparte:
-            for instruccion in elseparte:
-                instruccion.ejecutar()
+        #print("DEBUG - FALSE")
+        for bloque in elseparte:
+            self.recursividad_if(bloque)
       return valor
     
     def elifparte(self, valor):
@@ -274,8 +268,6 @@ class T(Transformer):
   #//////////////////////////////////////////////////////////////
 
 # //////////////////////////////////////////////////////////////
-
-
 class Impresion:
     def __init__(self, valor, dicc, diferido=False):
         self.valor = valor
@@ -284,7 +276,7 @@ class Impresion:
         #print("CLASE IMPRESION: ", dicc)
 
     def ejecutar(self):
-        print("CLASE IMPRESION EJECUTAR: ", self.valor)
+        #print("CLASE IMPRESION EJECUTAR: ", self.valor)
         try:
             if not self.diferido:
              if( self.valor in self.variables) :
@@ -298,31 +290,3 @@ class Impresion:
                     print( self.valor)
         except KeyError:
                 print("La variable no ha sido declarada")
-
-with open('../Gramatica/grammar.Lark', 'r') as f:
-    grammar = f.read()
-"""
-with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
-    programa = d.read()
-"""
-
-programa = """
-    /* esto es un comentario */
-    string nombre = "mundo";
-    string saludo = 1 + 3 + 4 + 5 + 6 + "Hola " + nombre + " feliz noche" ;
-    out(saludo);
-    out(1+2);
-    out("Hola " + nombre + " feliz noche");
-    int edad = 3 + 1 + 3;
-    out(edad);
-    out(1112);
-
-    if(1<2){
-        out(1);
-    };
-"""
-
-#Crear transformer
-trans = Lark(grammar, parser='lalr', transformer=T())
-# Transformar el árbol
-trans.parse(programa)
