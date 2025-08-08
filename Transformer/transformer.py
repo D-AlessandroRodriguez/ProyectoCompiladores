@@ -19,7 +19,7 @@ class T(Transformer):
         return valor[0] == "TRUE"
     
     def cadena(self, valor):
-        return str(valor[0])  # Eliminar comillas [1:-1]
+        return str(valor[0][1:-1])  # Eliminar comillas [1:-1]
     
     def VARNAME(self, valor):
         nombre = str(valor)
@@ -46,13 +46,15 @@ class T(Transformer):
     
     def impresion(self, valor):
         try:
-            print("\"cesar\"".split("\"").len())
-            print(self.variables[valor[0]])
+            if(valor[0] in self.variables) :
+             print(self.variables[valor[0]], end=" ")
+            else :
+             print(valor[0])
         except KeyError:
             print("La variable no ha sido declarada")
 
         #Impresion(valor[0]) envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
-        #print(valor[0])
+        #print(valor[0]) 
         return valor
     
     def declarar(self, valor):
@@ -244,7 +246,7 @@ programa = """
     bool esMayor = FALSE;
     string name = "cesar";
 
-    out("name");
+    out("sa#");
 """
 
 #Crear transformer
