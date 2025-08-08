@@ -19,7 +19,7 @@ class T(Transformer):
         return valor[0] == "TRUE"
     
     def cadena(self, valor):
-        return str(valor[0][1:-1])  # Eliminar comillas [1:-1]
+        return str(valor[0])  # Eliminar comillas [1:-1]
     
     def VARNAME(self, valor):
         nombre = str(valor)
@@ -49,7 +49,7 @@ class T(Transformer):
             if(valor[0] in self.variables) :
              print(self.variables[valor[0]], end=" ")
             else :
-             print(valor[0])
+             print(valor[0].replace('"', ''))
         except KeyError:
             print("La variable no ha sido declarada")
 
@@ -102,7 +102,8 @@ class T(Transformer):
       elifparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
       elseparte = valor[3] if len(valor) > 3 and valor[3] is not None else []
       
-      if condicion:
+
+      if bool(condicion):
         for instruccion in bloque_if:
             print("DEBUG - instruccion: ", instruccion)
             if instruccion is not None:
@@ -121,7 +122,7 @@ class T(Transformer):
         if not ejecutado and elseparte:
             for instruccion in elseparte:
                 instruccion.ejecutar()
-      return None
+      return valor
     
     def elifparte(self, valor):
         if not valor: # evitamos que guarde NONE y en cambio envíe una lista vacía
@@ -246,7 +247,10 @@ programa = """
     bool esMayor = FALSE;
     string name = "cesar";
 
-    out("sa#");
+    if(edad >= 18){ 
+        esMayor = TRUE;  
+        out("no se imprime");
+    }; 
 """
 
 #Crear transformer

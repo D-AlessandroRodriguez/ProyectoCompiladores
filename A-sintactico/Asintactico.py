@@ -13,10 +13,6 @@ programa = """
     };
 
 """
-
-
-
 parser = Lark(grammar, parser='lalr', lexer='contextual', maybe_placeholders=False)
-
 tree = parser.parse(programa)
 print(tree.pretty())
