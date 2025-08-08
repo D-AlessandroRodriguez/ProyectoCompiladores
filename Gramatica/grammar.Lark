@@ -1,4 +1,4 @@
-?start: instruccion+
+?start: instruccion+ 
 ?instruccion: impresion | declarar | asignacion ";" | decision | ciclo
  
 //repeticion
