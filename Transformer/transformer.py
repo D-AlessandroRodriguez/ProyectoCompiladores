@@ -5,6 +5,7 @@ class T(Transformer):
     def __init__(self):
         super(). __init__()
         self.variables = {}
+        self.resultadoConcat = None
     # Métodos para transformar los nodos del árbol
     # Cada método corresponde a una regla de la gramática
 
@@ -19,7 +20,7 @@ class T(Transformer):
         return valor[0] == "TRUE"
     
     def cadena(self, valor):
-        return str(valor[0])  # Eliminar comillas [1:-1]
+        return str(valor[0][1:-1])  # Eliminar comillas [1:-1]
     
     def VARNAME(self, valor):
         nombre = str(valor)
@@ -45,15 +46,23 @@ class T(Transformer):
         return valor[0] if valor else None
     
     def impresion(self, valor):
-        print("IMPRESION: ", valor[0])
-        Impresion(valor[0]) #envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
+        try:
+            if(valor[0] in self.variables) :
+             print(self.variables[valor[0]])
+            else :
+             print(valor[0].replace('"', ''))
+        except KeyError:
+            print("La variable no ha sido declarada")
+
+        return valor
+        #print("IMPRESION: ", valor[0])
+        #return Impresion(valor[0]) #envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
         #print(valor[0]) 
         #return valor
     
     def declarar(self, valor):
         tipo= valor[0]
         nombre = valor[1]
-        
         #print(valor)
         #Si hay un valor, lo asigno
         if len(valor) > 2:
@@ -70,7 +79,7 @@ class T(Transformer):
         variable = valor[0]
         expresion = valor[1]
         
-       # print(valor)
+        # print(valor)
         #Creo un diccionario para almacenar las variables y sus valores
         self.variables[variable] = expresion
         return valor
@@ -97,17 +106,17 @@ class T(Transformer):
       
 
       if bool(condicion):
+        print("DEBUG - TRUE")
         for instruccion in bloque_if:
             print("DEBUG - instruccion: ", instruccion)
             if instruccion is not None:
                 print("DEBUG - si llegamos al if")
                 #nos debería llevar a la funcion ejecutar de Impresion
                 instruccion 
-                
-
             else:
                 print("DEBUG - instrucción None dentro del if")
       else:
+        print("DEBUG - FALSE")
         ejecutado = False
         for cond, bloque in elifparte:
             if cond:
@@ -211,7 +220,27 @@ class T(Transformer):
             operador = valor[i]
             termino = valor[i + 1]
             if operador == "+":
-                resultado = resultado + termino
+                counter = 0
+                for val in valor:
+                    if isinstance(val, str) or val in self.variables:
+                        counter = counter + 1
+                    else:
+                        continue
+                
+                if (counter >= 1):
+                    # valor tiene almacenado: [val1, "+", val2, "+", val3, ...]
+                    resultado = ""        
+                    for val in valor:
+                        #if val == "+":  # ignoramos el operador
+                        #    continue
+                        # Si es nombre de variable, obtener su valor
+                        if isinstance(val, str) and val in self.variables:
+                            val = self.variables[val]
+                        elif(val == "+"):
+                            continue
+                        resultado += str(val)  # forzamos a string para concatenar
+                else:
+                    resultado = resultado + termino
             elif operador == "-":
                 resultado = resultado - termino
             elif operador == "*":
@@ -220,7 +249,10 @@ class T(Transformer):
                 resultado = resultado / termino
         return resultado
 
+  #//////////////////////////////////////////////////////////////
+
 # //////////////////////////////////////////////////////////////
+
 
 class Impresion:
     def __init__(self, valor):
@@ -237,8 +269,6 @@ class Impresion:
         except KeyError:
             print("La variable no ha sido declarada")
 
-
-
 with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
 """
@@ -247,15 +277,14 @@ with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
 """
 
 programa = """
-    /* esto es un comentario */
-    int edad = 7; 
-    bool esMayor = FALSE;
-    string name = "cesar";
-
-    if(edad <= 18){ 
-        esMayor = TRUE;  
-        out("se imprime");
-    }; 
+     /* esto es un comentario */
+    string nombre = "mundo";
+    string saludo = 1 + 3 + 4 + 5 + 6 + "Hola " + nombre + " feliz noche" ;
+    out(saludo);
+    out(1+2);
+    out("Hola " + nombre + " feliz noche");
+    int edad = 33;
+    out(edad);
 """
 
 #Crear transformer
