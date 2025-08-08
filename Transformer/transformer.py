@@ -116,12 +116,13 @@ class T(Transformer):
         for cond, bloque in elifparte:
             if cond:
                 for instruccion in bloque:
-                    instruccion.ejecutar()
-                ejecutado = True
+                 #  instruccion.ejecutar()
+                 ejecutado = True
                 break
         if not ejecutado and elseparte:
-            for instruccion in elseparte:
-                instruccion.ejecutar()
+              for instruccion in elseparte:
+                  print("CESARIN")
+                 #instruccion.ejecutar()
       return valor
     
     def elifparte(self, valor):
