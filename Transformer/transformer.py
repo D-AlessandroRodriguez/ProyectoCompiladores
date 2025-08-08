@@ -1,7 +1,8 @@
 from lark import Lark, Transformer, Token
-
+# self.variables.get(nombre, nombre)
 class T(Transformer):
     def __init__(self):
+        super(). __init__()
         self.variables = {}
     # Métodos para transformar los nodos del árbol
     # Cada método corresponde a una regla de la gramática
@@ -9,18 +10,24 @@ class T(Transformer):
     #//////////Extras////////////
     def entero(self, valor):
         return int(valor[0])
+    
     def decimal(self, valor):
         return float(valor[0])
+    
     def booleano(self, valor):
         return valor[0] == "TRUE"
+    
     def cadena(self, valor):
         return str(valor[0][1:-1])  # Eliminar comillas
+    
     def VARNAME(self, valor):
-        nombre = str(valor[0])
-        return self.variables.get(nombre, nombre)
+        nombre = str(valor)
+        return nombre
+    
     def bloque(self, valor):
         print("DEBUG - BLOQUE: ", valor)
         return valor
+    
     def termino(self, valor):
        return valor[0]
     # /////////////////////////
@@ -34,40 +41,47 @@ class T(Transformer):
   
     def instruccion(self, valor):
         print("INSTRUCCION: ", valor)
-        if valor[0] is None:
-            print("DEBUG - instrucción inválida:", valor)
-        return valor[0]
+        return valor[0] if valor else None
     
     def impresion(self, valor):
-        Impresion(valor[0]) # envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
+        try:
+            print(self.variables[valor[0]], end=" ")
+        except KeyError:
+            print("La variable no ha sido declarada")
+
+        #Impresion(valor[0]) envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
         #print(valor[0])
+        return valor
     
     def declarar(self, valor):
         tipo= valor[0]
         nombre = valor[1]
 
+        #print(valor)
         #Si hay un valor, lo asigno
         if len(valor) > 2:
             variable = valor[2]
         else:
-            variable = None    
+            variable = None
 
         self.variables[nombre] = variable
-        return None
+        return valor
         
     
     def asignacion(self, valor):
         #Se lee de izq a der
         variable = valor[0]
         expresion = valor[1]
+        
+       # print(valor)
         #Creo un diccionario para almacenar las variables y sus valores
         self.variables[variable] = expresion
-        return None
+        return valor
     
     def decision(self, valor):
+        print(valor)
         return valor[0]
     
-       
     def ciclo(self, valor):
         return valor[0]
     
@@ -223,15 +237,12 @@ with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
 programa = """
     /* esto es un comentario */
     int edad = 17; 
-    bool esMayor = FALSE; 
+    bool esMayor = FALSE; out(esMayor);
 
     if(edad >= 18){ 
         esMayor = TRUE;  
         out("no se imprime");
-    } else { 
-        esMayor = FALSE;  
-        out("sí se imprime");
-    }; 
+    };
 """
 
 #Crear transformer

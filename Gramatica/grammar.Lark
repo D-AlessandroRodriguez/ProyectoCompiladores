@@ -18,7 +18,7 @@ bloque: "{" start "}"
 //
 
 //se declara varibales y se inicializa
-declarar: TIPOVARIABLE VARNAME ("=" valor)? ";"
+declarar: TIPOVARIABLE VARNAME ("=" expresion)? ";"
 
 //se imprime 
 impresion: "out" "(" expresion ")" ";"
