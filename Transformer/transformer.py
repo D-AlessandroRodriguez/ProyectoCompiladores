@@ -38,7 +38,6 @@ class T(Transformer):
 
     #///////////// Métodos para manejar la gramática/////////
     def start(self, valor):
-        print("DEBUG - START: ", valor)
         return valor
         
   
@@ -226,7 +225,7 @@ class T(Transformer):
             if operador == "+":
                 counter = 0
                 for val in valor:
-                    if re.fullmatch(r"\d+", str(val)) or re.fullmatch(r"\+", str(val)):
+                    if re.fullmatch(r"((([1-9]([0-9]+)*)|0)\.([0-9]+))|\d+", str(val)) or re.fullmatch(r"\+|\-|\/|\*", str(val)):
                         counter = counter + 1
                     else:
                         continue
@@ -285,9 +284,9 @@ programa = """
     out(saludo);
     out(1+2);
     out("Hola " + nombre + " feliz noche");
-    int edad = 3 + 1 + 3;
+    int edad = 33 - 10.5 - 5.5*1 + (60/2);
     out(edad);
-    out(1112);
+
 """
 
 #Crear transformer
