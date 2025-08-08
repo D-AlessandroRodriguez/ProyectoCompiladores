@@ -1,7 +1,9 @@
 from lark import Lark, Transformer, Token
+# self.variables.get(nombre, nombre)
 
 class T(Transformer):
     def __init__(self):
+        super(). __init__()
         self.variables = {}
     # Métodos para transformar los nodos del árbol
     # Cada método corresponde a una regla de la gramática
@@ -9,18 +11,24 @@ class T(Transformer):
     #//////////Extras////////////
     def entero(self, valor):
         return int(valor[0])
+    
     def decimal(self, valor):
         return float(valor[0])
+    
     def booleano(self, valor):
         return valor[0] == "TRUE"
+    
     def cadena(self, valor):
-        return str(valor[0][1:-1])  # Eliminar comillas
+        return str(valor[0])  # Eliminar comillas [1:-1]
+    
     def VARNAME(self, valor):
-        nombre = str(valor[0])
-        return self.variables.get(nombre, nombre)
+        nombre = str(valor)
+        return nombre
+    
     def bloque(self, valor):
         print("DEBUG - BLOQUE: ", valor)
         return valor
+    
     def termino(self, valor):
        return valor[0]
     # /////////////////////////
@@ -34,40 +42,44 @@ class T(Transformer):
   
     def instruccion(self, valor):
         print("INSTRUCCION: ", valor)
-        if valor[0] is None:
-            print("DEBUG - instrucción inválida:", valor)
-        return valor[0]
+        return valor[0] if valor else None
     
     def impresion(self, valor):
-        Impresion(valor[0]) # envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
-        #print(valor[0])
+        print("IMPRESION: ", valor[0])
+        Impresion(valor[0]) #envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
+        #print(valor[0]) 
+        #return valor
     
     def declarar(self, valor):
         tipo= valor[0]
         nombre = valor[1]
-
+        
+        #print(valor)
         #Si hay un valor, lo asigno
         if len(valor) > 2:
             variable = valor[2]
         else:
-            variable = None    
+            variable = None
 
         self.variables[nombre] = variable
-        return None
+        return valor
         
     
     def asignacion(self, valor):
         #Se lee de izq a der
         variable = valor[0]
         expresion = valor[1]
+        
+       # print(valor)
         #Creo un diccionario para almacenar las variables y sus valores
         self.variables[variable] = expresion
-        return None
+        return valor
     
+    #///////////////////////////////hasta aqui funciona
     def decision(self, valor):
+        print(valor)
         return valor[0]
     
-       
     def ciclo(self, valor):
         return valor[0]
     
@@ -83,12 +95,16 @@ class T(Transformer):
       elifparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
       elseparte = valor[3] if len(valor) > 3 and valor[3] is not None else []
       
-      if condicion:
+
+      if bool(condicion):
         for instruccion in bloque_if:
             print("DEBUG - instruccion: ", instruccion)
             if instruccion is not None:
                 print("DEBUG - si llegamos al if")
-                instruccion.ejecutar() #nos debería llevar a la funcion ejecutar de Impresion
+                #nos debería llevar a la funcion ejecutar de Impresion
+                instruccion 
+                
+
             else:
                 print("DEBUG - instrucción None dentro del if")
       else:
@@ -102,7 +118,7 @@ class T(Transformer):
         if not ejecutado and elseparte:
             for instruccion in elseparte:
                 instruccion.ejecutar()
-      return None
+      return valor
     
     def elifparte(self, valor):
         if not valor: # evitamos que guarde NONE y en cambio envíe una lista vacía
@@ -164,7 +180,8 @@ class T(Transformer):
                 return self.variables.get(nombre, nombre)
             return v
 
-        resultado = evaluar(valor[0])
+        resultado = evaluar(self.variables[valor[0]])
+
         i = 1
         while i < len(valor):
             operador = valor[i]
@@ -208,8 +225,17 @@ class T(Transformer):
 class Impresion:
     def __init__(self, valor):
         self.valor = valor
+        print("CLASE IMPRESION: ", self.valor)
+
     def ejecutar(self):
-        print(self.valor)
+        print("CLASE IMPRESION EJECUTAR: ", self.valor)
+        try:
+            if(self.valor in self.variables) :
+             print((self.valor).variables[self.valor], end=" ")
+            else :
+             print((self.valor).replace('"', ''))
+        except KeyError:
+            print("La variable no ha sido declarada")
 
 
 
@@ -222,15 +248,13 @@ with open('../Ejemplos_lenguaje/programas.txt', 'r') as d:
 
 programa = """
     /* esto es un comentario */
-    int edad = 17; 
-    bool esMayor = FALSE; 
+    int edad = 7; 
+    bool esMayor = FALSE;
+    string name = "cesar";
 
-    if(edad >= 18){ 
+    if(edad <= 18){ 
         esMayor = TRUE;  
-        out("no se imprime");
-    } else { 
-        esMayor = FALSE;  
-        out("sí se imprime");
+        out("se imprime");
     }; 
 """
 
