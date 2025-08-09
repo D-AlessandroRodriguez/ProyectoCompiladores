@@ -7,6 +7,7 @@ class T(Transformer):
         self.variables = {}
         self.resultadoConcat = None
         self.esta_dentro_de_if = False
+        self.contadorLineas = 0
     # Métodos para transformar los nodos del árbol
     # Cada método corresponde a una regla de la gramática
 
@@ -40,7 +41,9 @@ class T(Transformer):
     def start(self, valor):
         #print("DEBUG - START: ", valor)
         return valor
-        
+    
+    def dolar(self, valor):
+        self.contadorLineas += 1;
   
     def instruccion(self, valor):
         if isinstance(valor[0], Impresion):
@@ -78,7 +81,6 @@ class T(Transformer):
         nombre = valor[1]
         
         #print(valor)
-        #Si hay un valor, lo asigno
         if len(valor) > 2:
             variable = valor[2]
         else:
@@ -199,7 +201,6 @@ class T(Transformer):
                 break
       return None
     
-
 # ////////////////Metodos de condiciones y operaciones logicas////////////////
     def condicion(self, valor):
         def evaluar(v):
