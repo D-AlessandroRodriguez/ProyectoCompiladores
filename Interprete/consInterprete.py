@@ -19,30 +19,33 @@ class Interpretador:
     def printTable(self,program):
         try:
             lexer = self.parserTree.lex(program)
-            print("\n🔍 ANALIZADOR LÉXICO")
+            print("\n TABLA ")
             print("====================")
             print(f"{'Línea':<10}{'Token':<15}{'Valor':<20}{'Columna':<10}")
             print("-" * 60)
             for token in lexer:
                 print(f"{token.line:<10}{token.type:<15}{str(token.value):<20}{token.column:<10}")
         except Exception as e:
-            print("❌ Error al analizar léxicamente:", e)
+            print(" Error al analizar léxicamente:", e)
       
     def ejecutar_linea(self, linea):
-        try:
-            if not linea == "Tree()":
-                self.parser.parse(linea)
-                self.Sentence.append(linea)
-            else:
-                programaComplete = " ".join(self.Sentence)
-                tree = self.parserTree.parse(programaComplete)
-                self.printTable(linea)
-                print("#####################")
-                print(" ARBOL SINTÁCTICO")
-                print("#####################")
-                print(tree.pretty())
-        except Exception as e:
-            print("Error al interpretar:", e)
+       try:
+        if linea != "Tree()":
+            self.parser.parse(linea)
+            self.Sentence.append(linea)
+        else:
+            programaComplete = " ".join(self.Sentence)
+            tree = self.parserTree.parse(programaComplete)
+
+            print("#####################")
+            print(" ARBOL SINTÁCTICO")
+            print("#####################")
+            print(tree.pretty())
+
+          
+            self.printTable(programaComplete)
+       except Exception as e:
+        print("Error al interpretar:", e)
 
     def ejecutar(self, texto):
         try:
@@ -70,8 +73,9 @@ class Interpretador:
                 exit()
             if linea == "":
                 continue  # evita intentar ejecutar líneas vacías
+            
             self.ejecutar_linea(linea)
-            self.printTable(linea)
+        
             
             
         
