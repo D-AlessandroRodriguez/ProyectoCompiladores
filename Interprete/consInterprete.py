@@ -4,16 +4,30 @@ from treeLibraries.Asintactico import Tree
 import os
 
 class Interpretador:
-    def __init__(self, grammar):
+    def __init__(self, grammar,programa):
         self.Sentence = []
         self.grammar = grammar
+        self.programa = programa
         self.transformer = T()
         self.parserTree = Lark(self.grammar, parser='lalr', lexer='contextual', maybe_placeholders=False)
         self.parser = Lark(self.grammar, parser='lalr', transformer=self.transformer)
 
     def ejecutar_programa(self, programa):
         self.ejecutar(programa)
-
+        self.printTable(self.programa)
+    
+    def printTable(self,program):
+        try:
+            lexer = self.parserTree.lex(program)
+            print("\n🔍 ANALIZADOR LÉXICO")
+            print("====================")
+            print(f"{'Línea':<10}{'Token':<15}{'Valor':<20}{'Columna':<10}")
+            print("-" * 60)
+            for token in lexer:
+                print(f"{token.line:<10}{token.type:<15}{str(token.value):<20}{token.column:<10}")
+        except Exception as e:
+            print("❌ Error al analizar léxicamente:", e)
+      
     def ejecutar_linea(self, linea):
         try:
             if not linea == "Tree()":
@@ -22,6 +36,7 @@ class Interpretador:
             else:
                 programaComplete = " ".join(self.Sentence)
                 tree = self.parserTree.parse(programaComplete)
+                self.printTable(linea)
                 print("#####################")
                 print(" ARBOL SINTÁCTICO")
                 print("#####################")
@@ -56,3 +71,8 @@ class Interpretador:
             if linea == "":
                 continue  # evita intentar ejecutar líneas vacías
             self.ejecutar_linea(linea)
+            self.printTable(linea)
+            
+            
+        
+            
