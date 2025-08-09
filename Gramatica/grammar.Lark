@@ -1,8 +1,8 @@
-?start: instruccion+ 
+start: instruccion+ dolar
 ?instruccion: impresion | declarar | asignacion ";" | decision | ciclo | TREE
  
 TREE: "Tree()"
-
+!dolar: "$"
 //repeticion
 ciclo: forloop | whileloop | dowhile 
 forloop: "for" "(" asignacion ";" condicion ";" asignacion ")" bloque ";"

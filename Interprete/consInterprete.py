@@ -22,6 +22,9 @@ class Interpretador:
             else:
                 programaComplete = " ".join(self.Sentence)
                 tree = self.parserTree.parse(programaComplete)
+                print("#####################")
+                print(" ARBOL SINTÁCTICO")
+                print("#####################")
                 print(tree.pretty())
         except Exception as e:
             print("Error al interpretar:", e)
@@ -35,6 +38,9 @@ class Interpretador:
                 newText = texto.replace("Tree()", "")
                 self.parser.parse(newText)
                 tree = self.parserTree.parse(newText)
+                print("#####################")
+                print(" ARBOL SINTÁCTICO")
+                print("#####################")
                 print(tree.pretty())
 
         except Exception as e:

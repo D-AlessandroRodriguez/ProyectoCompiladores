@@ -76,7 +76,7 @@ class T(Transformer):
     def declarar(self, valor):
         tipo= valor[0]
         nombre = valor[1]
-        print(tipo)
+        
         #print(valor)
         #Si hay un valor, lo asigno
         if len(valor) > 2:
@@ -234,15 +234,23 @@ class T(Transformer):
         return resultado
     
     def expresion(self, valor):
-        resultado = valor[0]
+        if valor[0] in self.variables and (isinstance(self.variables[valor[0]], int) or isinstance(self.variables[valor[0]], float)):
+            resultado = self.variables[valor[0]]
+        else: 
+            resultado = valor[0]
         for i in range(1, len(valor), 2):
             operador = valor[i]
             termino = valor[i + 1]
+            if termino in self.variables and (isinstance(self.variables[termino], int) or isinstance(self.variables[termino], float)):
+                termino = self.variables[termino]
             if operador == "+":
                 counter = 0
                 for val in valor:
-                    if re.fullmatch(r"\d+", str(val)) or re.fullmatch(r"\+", str(val)):
+                    if re.fullmatch(r"((([1-9]([0-9]+)*)|0)\.([0-9]+))|\d+", str(val)) or re.fullmatch(r"\+|\-|\/|\*", str(val)):
                         counter = counter + 1
+                    elif val in self.variables and (isinstance(self.variables[val], int) or isinstance(self.variables[val], float)):
+                        counter = counter + 1
+                        termino = self.variables[val]
                     else:
                         continue
                 
@@ -266,7 +274,7 @@ class T(Transformer):
                 resultado = resultado / termino
         return resultado
 
-  #//////////////////////////////////////////////////////////////
+#//////////////////////////////////////////////////////////////
 
 # //////////////////////////////////////////////////////////////
 class Impresion:
