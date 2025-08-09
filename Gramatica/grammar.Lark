@@ -1,6 +1,8 @@
-?start: instruccion+
-?instruccion: impresion | declarar | asignacion ";" | decision | ciclo
+start: instruccion+ dolar
+?instruccion: impresion | declarar | asignacion ";" | decision | ciclo | TREE
  
+TREE: "Tree()"
+!dolar: "$"
 //repeticion
 ciclo: forloop | whileloop | dowhile 
 forloop: "for" "(" asignacion ";" condicion ";" asignacion ")" bloque ";"
@@ -9,7 +11,7 @@ dowhile: "do" bloque "while" "(" condicion ")" ";"
 
 //aqui se declara el if
 decision: ifstatement
-!ifstatement: "if" "(" (condicion|BOOL)")" bloque elifparte? elseparte? ";" 
+ifstatement: "if" "(" (condicion|BOOL)")" bloque elifparte? elseparte? ";" 
 elifparte: ("elif" "(" (condicion|BOOL) ")" bloque)* 
 elseparte: "else" bloque 
 
@@ -18,10 +20,10 @@ bloque: "{" start "}"
 //
 
 //se declara varibales y se inicializa
-declarar: TIPOVARIABLE VARNAME ("=" valor)? ";"
+declarar: TIPOVARIABLE VARNAME ("=" expresion)? ";"
 
 //se imprime 
-impresion: PRINT "(" expresion ")" ";"
+impresion: "out" "(" expresion ")" ";"
 
 //asignacion entre variables y expresion
 asignacion: VARNAME "=" expresion 
@@ -33,7 +35,7 @@ valor: INT -> entero | FLOAT -> decimal | BOOL -> booleano | STRING -> cadena
 
 //objetos terminales
 TIPOVARIABLE: "int" | "float" | "string" | "bool"
-PRINT: "out"
+//PRINT: "out"
 BOOL: "TRUE" | "FALSE"
 OPERADOR: "+" | "-" | "*" | "/"
 OPERADORCOMP: ">=" | "<=" | "==" | "!=" | "<" | ">"
@@ -43,7 +45,7 @@ STRING: /"[^"\n]*"/
 FLOAT: /(([1-9]([0-9]+)*)|0)\.([0-9]+)/
 INT: /[0-9]+/
 
-VARNAME: /(?!int|float|string|bool|AND|OR|TRUE|FALSE)[a-zA-Z_][a-zA-Z0-9_]*/
+VARNAME: /(?!int|float|string|bool|AND|OR|TRUE|FALSE|Tree())[a-zA-Z_][a-zA-Z0-9_]*/
 
 COMMENT: /\/\*([\s\S]*?)\*\//
 

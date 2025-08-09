@@ -1,69 +1,14 @@
-int num = 3; 
-int num2 = 5; 
-string word1 = "hola "; 
-string word2 = " mundo "; 
-string word3 = "hola mundo ";  
-
-if(num < num2){ 
-     out(word1);  
-} elif(num == num2){ 
-     out(word2);  
-} else { 
-     out(word3);  
-}; $ 
-
-bool seguir = TRUE; 
-int i = 0; 
-
-for(i = 0; i < 3; i = i + 1){ 
-
-        out(“ número " + i); 
-
-}; $ 
-  
-int contador = 0; 
-bool activo = TRUE; 
-
-while(activo){ 
-
-        out("Contador: " + contador);
-        contador = contador + 1; 
-        if(contador >= 5){ 
-            activo = FALSE;  
-        }; 
-
-};$ 
-
-  
-
-int x = 0; 
-bool repetir = TRUE; 
-
-do { 
-
-        out("Valor de x: " + x); 
-        x = x + 1; 
-        if(x >= 2){ 
-             repetir = FALSE;  
-
-        }; 
-} while(repetir); $ 
-
-  
-
-int edad = 17; 
-bool esMayor = FALSE; 
-
-if(edad >= 18){ 
-    esMayor = TRUE;  
-} else { 
-    esMayor = FALSE;  
-}; 
-
-  
-
-if(esMayor){ 
-    out("Es mayor de edad.");  
-} else { 
-   out("Es menor de edad.");  
-}; $
+    /* esto es un comentario */
+    string nombre = "mundo";
+    string saludo = 1 + 3 + 4 + 5 + 6 + "Hola " + nombre + " feliz noche" ;
+    out(saludo);
+    out(1+2);
+    out("Hola " + nombre + " feliz noche");
+    int edad = 33 - 10.5 - 5.5*1 + (60/2);
+    out(edad);
+<<<<<<< HEAD
+    out(1112);$
+=======
+    int todo = 50 + 3 + edad;
+    out(todo);
+>>>>>>> 8431da594e69d24726f23e05ad25a58c952532e9
