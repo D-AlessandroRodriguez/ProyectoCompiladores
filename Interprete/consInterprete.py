@@ -37,9 +37,8 @@ class Interpretador:
             programaComplete = " ".join(self.Sentence)
             tree = self.parserTree.parse(programaComplete)
 
-            print("#####################")
             print(" ARBOL SINTÁCTICO")
-            print("#####################")
+            print("====================")
             print(tree.pretty())
 
           
@@ -56,9 +55,9 @@ class Interpretador:
                 newText = texto.replace("Tree()", "")
                 self.parser.parse(newText)
                 tree = self.parserTree.parse(newText)
-                print("#####################")
-                print(" ARBOL SINTÁCTICO")
-                print("#####################")
+                
+                print(" \nARBOL SINTÁCTICO")
+                print("====================")
                 print(tree.pretty())
 
         except Exception as e:
