@@ -1,6 +1,5 @@
 from lark import Lark
 from Interprete.transformer import T
-from treeLibraries.Asintactico import Tree
 import os
 
 class Interpretador:

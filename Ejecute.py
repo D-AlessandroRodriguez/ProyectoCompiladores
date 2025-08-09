@@ -1,5 +1,5 @@
 
-from treeLibraries.Asintactico import Tree
+
 from Interprete.consInterprete import Interpretador
 
 """
