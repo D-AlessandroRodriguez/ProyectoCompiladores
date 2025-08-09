@@ -40,8 +40,8 @@ class Interpretador:
             print("====================")
             print(tree.pretty())
 
-          
             self.printTable(programaComplete)
+            self.Sentence = []
        except Exception as e:
         print("Error al interpretar:", e)
 
