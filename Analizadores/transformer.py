@@ -5,11 +5,11 @@ class T(Transformer):
     def __init__(self):
         super(). __init__()
         self.variables = {}
-        self.resultadoConcat = None
-        self.esta_dentro_de_if = False
-        self.contadorLineas = 0
-    # Métodos para transformar los nodos del árbol
-    # Cada método corresponde a una regla de la gramática
+        self.tableSymbol = {}
+
+        self.dentroIf = False
+        self.dentroElse = False
+        self.Condicion = False
 
     #//////////Extras////////////
     def entero(self, valor):
@@ -22,87 +22,109 @@ class T(Transformer):
         return valor[0] == "TRUE"
     
     def cadena(self, valor):
-        return str(valor[0][1:-1])  # Eliminar comillas [1:-1]
+        return str(valor[0])
     
     def VARNAME(self, valor):
-        nombre = str(valor)
-        return nombre
+        return valor
     
     def bloque(self, valor):
-        #print("DEBUG - BLOQUE: ", valor)
         return valor
     
     def termino(self, valor):
-       return valor[0]
+       return valor
     # /////////////////////////
 
 
     #///////////// Métodos para manejar la gramática/////////
     def start(self, valor):
-        #print("DEBUG - START: ", valor)
         return valor
     
-    def dolar(self, valor):
-        self.contadorLineas += 1;
-  
+    def printable(self, valor):
+            print(" " * 37  + "TABLA ")
+            print("-" * 80)
+            print("name", " " * 16, "tipo", " " * 16,"valor", " " * 16, "linea", " " * 16)
+            print("-" * 80)
+            for item in self.tableSymbol.values():
+                for val in item.values():
+                    valor = 22 - len(str(val))
+                    print(val," " * valor,end="")
+                print()
+            print("-" * 80)
+        
+    
     def instruccion(self, valor):
-        if isinstance(valor[0], Impresion):
-            # Si estamos dentro de un if, marcamos como diferido
-            if self.esta_dentro_de_if:  # ¡Necesitamos un flag para esto!
-                valor[0].diferido = True
-            valor[0].ejecutar()  # Las diferidas no se ejecutarán aquí
+        print("print de instruccion->",valor)
         return valor[0]
     
     def TREE(self, valor):
         print(valor)
 
+#tomar en cuenta que muchas veces no se necesita imprimir una variable sino solo un literal
     def impresion(self, valor):
-            try:
-             if(valor[0] in self.variables):
-                print("1", self.variables[valor[0]])
-             elif(not isinstance(valor[0], (int,float))):
-                print("2", valor[0].replace('"', ''))
-             else :
-                if isinstance(valor[0], str):
-                    print("3", valor[0].replace('"', ''))
-                else:
-                    print("4", valor[0])
-            except KeyError:
-                print("La variable no ha sido declarada")
-            return Impresion(valor[0], self.variables, self.esta_dentro_de_if)
+        tipo = type(valor[0]) 
+   
+        print(self.dentroIf, self.Condicion, self.dentroElse)
+        if self.dentroIf == True and self.Condicion == True and self.dentroElse == False:
+            Impresion().ejecutar(self, valor)
+        elif self.dentroIf == False and self.dentroElse == False:
+            Impresion().ejecutar(self, valor)
+        elif self.dentroIf == True and self.Condicion == False and self.dentroElse == True:
+             Impresion().ejecutar(self, valor)
         
-        #print("IMPRESION: ", valor[0])
-        #return Impresion(valor[0]) #envia a la clase Impresion para guardar el valor y lo imprime solo cuando se solicita
-        #print(valor[0]) 
-        #return valor
-    
     def declarar(self, valor):
-        tipo= valor[0]
-        nombre = valor[1]
+        tipo = str(valor[0])
+        nombre = str(valor[1])
         
-        #print(valor)
-        if len(valor) > 2:
-            variable = valor[2]
-        else:
-            variable = None
-
-        self.variables[nombre] = variable
+        try:
+            if  self.tableSymbol[nombre]:
+                print(f"Error linea-{ valor[0].line} La variable <{nombre}> ya ha sido declarada")
+        except KeyError:
+            if len(valor) > 2:
+                variable = valor[2]
+                self.tableSymbol[nombre] = (
+                    {
+                    "name": nombre,
+                    "tipo": tipo,
+                    "valor":  valor[2], 
+                    "linea": valor[0].line
+                    }
+                )
+            else:
+                variable = None
+                self.tableSymbol[nombre] = (
+                    {
+                    "name": nombre,
+                    "tipo": tipo,
+                    "valor":  None, 
+                    "linea": valor[0].line
+                    }
+                )
+            self.variables[nombre] = variable
         return valor
         
     
     def asignacion(self, valor):
-        #Se lee de izq a der
         variable = valor[0]
         expresion = valor[1]
         
-        # print(valor)
-        #Creo un diccionario para almacenar las variables y sus valores
-        self.variables[variable] = expresion
+        variableType = self.tableSymbol[variable]
+        tipo = variableType["tipo"]
+
+        if variableType["tipo"] == "int" and isinstance(expresion, int): 
+            self.variables[variable] = expresion
+        elif variableType["tipo"] == "float" and isinstance(expresion, float):
+            self.variables[variable] = expresion
+        elif variableType["tipo"] == "string" and isinstance(expresion, str):
+            self.variables[variable] = expresion
+        elif variableType["tipo"] == "bool" and isinstance(expresion, bool):
+            self.variables[variable] = expresion
+        else:
+            print(f"Error linea {valor[0].line} no se puede asignar \"{expresion}\" a la variable \"{variable}\"")
+       
         return valor
     
     #///////////////////////////////hasta aqui funciona
     def decision(self, valor):
-        #print(valor)
         return valor[0]
     
     def ciclo(self, valor):
@@ -110,46 +132,14 @@ class T(Transformer):
     
     #////////////////////////////////////////////////////
     #metodo recursivo para imprimir las sentencias dentro del if
-    def recursividad_if(self, param):
-        # Caso base: Si es una Impresion, ejecútala
-        if isinstance(param, Impresion):
-            param.ejecutar()
-        
-        # Caso recursivo: Si es una lista o iterable (pero no un string)
-        elif isinstance(param, (list, tuple)) or (hasattr(param, '__iter__') and not isinstance(param, str)):
-            for param1 in param:
-                self.recursividad_if(param1)
-        
+    def ifgrammar(self, valor):
+        self.dentroIf = True
 
-    
     # /////////////Métodos para manejar decisiones ////////////////
     def ifstatement(self, valor):
-      #print("DEBUG - valor: ", valor)
-      
-      condicion = valor[0]
-      self.esta_dentro_de_if = True
-      bloque_if = valor[1]
-      elseparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
-      # elifparte = valor[2] if len(valor) > 2 and valor[2] is not None else []
-      # elseparte = valor[3] if len(valor) > 3 and valor[3] is not None else []
-      
-
-      if bool(condicion):
-        #print("DEBUG - TRUE")
-        for instruccion in bloque_if:
-           # print("DEBUG - instruccion: ", instruccion)
-            if instruccion is not None:
-                #print("DEBUG - si llegamos al if")
-                #nos debería llevar a la funcion ejecutar de Impresion
-                self.recursividad_if(instruccion)
-            else:
-                print("DEBUG - instrucción None dentro del if")
-      else:
-        #print("DEBUG - FALSE")
-        for bloque in elseparte:
-            self.recursividad_if(bloque)
       return valor
     
+    #esta parte no se ejecutara por los momentos
     def elifparte(self, valor):
         if not valor: # evitamos que guarde NONE y en cambio envíe una lista vacía
             print("DEBUG - ELIF: ", valor)
@@ -159,8 +149,12 @@ class T(Transformer):
             condicion = valor[i]
             bloque = valor[i + 1]
             resultado.append((condicion, bloque))
-        print("DEBUG - ELIF del for: ", valor)
         return resultado
+
+    def elsegrammar(self, valor):
+        if self.Condicion == False:
+            self.dentroElse = True
+        self.Condicion = False
 
     def elseparte(self, valor):
         if not valor or valor[0] is None: #evitamos que guarde NONE y en cambio envíe una lista vacía
@@ -232,9 +226,11 @@ class T(Transformer):
             elif operador in ("||", "OR"):
                 resultado = resultado or derecho
             i += 2
+        self.Condicion = resultado
         return resultado
     
     def expresion(self, valor):
+       # print("expresion->" , valor)
         if valor[0] in self.variables and (isinstance(self.variables[valor[0]], int) or isinstance(self.variables[valor[0]], float)):
             resultado = self.variables[valor[0]]
         else: 
@@ -273,30 +269,47 @@ class T(Transformer):
                 resultado = resultado * termino
             elif operador == "/":
                 resultado = resultado / termino
+       #validamos si existe el nombre de la variable y lo asignamos a la variable existen   
         return resultado
 
-#//////////////////////////////////////////////////////////////
-
 # //////////////////////////////////////////////////////////////
-class Impresion:
-    def __init__(self, valor, dicc, diferido=False):
-        self.valor = valor
-        self.variables = dicc
-        self.diferido = diferido
-        #print("CLASE IMPRESION: ", dicc)
-
-    def ejecutar(self):
-        #print("CLASE IMPRESION EJECUTAR: ", self.valor)
+class Impresion(Transformer):
+    """def __init__(self, valor):
+        valor = valor
+        self.variables = self
+    """
+    def ejecutar(selfNew, self, valor):
+        tipo = type(valor[0]) 
         try:
-            if not self.diferido:
-             if( self.valor in self.variables) :
-                print(self.variables[ self.valor])
-             elif(not isinstance( self.valor, (int,float))):
-                print( self.valor.replace('"', ''))
-             else :
-                if isinstance( self.valor, str):
-                    print( self.valor.replace('"', ''))
-                else:
-                    print( self.valor)
+            if str(valor[0]).find("\"")>=0:
+                print("impresion cadena->",valor[0])
+            elif tipo == int or tipo == float or tipo == bool:
+                print("impresion numero->", valor[0])
+            elif self.variables.get(valor[0]) != None:
+                print("impresion variable->",self.variables.get(valor[0]))
+            else:
+                print(f"Error de impresion linea-{valor[0].line} la variable <{valor[0]}> no existe")
         except KeyError:
                 print("La variable no ha sido declarada")
+# //////////////////////////////////////////////////////////////
+
+with open('../Gramatica/grammar.Lark', 'r') as f:
+    grammar = f.read()
+
+entrada ="""/* esto es un comentario */
+    int edad = 3;
+    out(edad);
+
+    if(3<4){
+        string name = "entre";
+        out(name);
+    }else{
+        out(edad);
+    };
+    
+    Tree()
+    """
+#$prinTable()$
+
+parser = Lark(grammar, parser='lalr', transformer = T())
+parser.parse(entrada)

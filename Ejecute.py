@@ -1,6 +1,6 @@
 
 
-from Interprete.consInterprete import Interpretador
+from Analizadores.ActionLenguaje import Interpretador
 
 """
     Main donde se llamaa a la clase Interpretador

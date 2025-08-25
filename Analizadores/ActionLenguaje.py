@@ -1,5 +1,5 @@
 from lark import Lark
-from Interprete.transformer import T
+from Analizadores.transformer import T
 import os
 
 class Interpretador:
@@ -9,7 +9,7 @@ class Interpretador:
         self.programa = programa
         self.transformer = T()
         self.parserTree = Lark(self.grammar, parser='lalr', lexer='contextual', maybe_placeholders=False)
-        self.parser = Lark(self.grammar, parser='lalr', transformer=self.transformer)
+        self.parser = Lark(self.grammar, parser='lalr', transformer = self.transformer)
 
     def ejecutar_programa(self, programa):
         self.ejecutar(programa)
@@ -41,7 +41,6 @@ class Interpretador:
             print(tree.pretty())
 
             self.printTable(programaComplete)
-            self.Sentence = []
        except Exception as e:
         print("Error al interpretar:", e)
 
