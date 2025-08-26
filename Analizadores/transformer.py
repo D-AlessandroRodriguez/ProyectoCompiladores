@@ -2,11 +2,15 @@ from lark import Lark, Transformer, Token
 import re
 
 class T(Transformer):
-    def __init__(self):
+    def __init__(self, grammar, inputSentence):
         super(). __init__()
+        #diccionarios
         self.variables = {}
         self.tableSymbol = {}
-
+        #gramatica
+        self.grammar = grammar
+        self.inputSentence = inputSentence
+        #centinelas
         self.dentroIf = False
         self.dentroElse = False
         self.Condicion = False
@@ -57,27 +61,21 @@ class T(Transformer):
         return valor[0]
     
     def TREE(self, valor):
-        print(valor)
+        print(Lark(self.grammar, parser="lalr").parse(self.inputSentence).pretty())
 
-#tomar en cuenta que muchas veces no se necesita imprimir una variable sino solo un literal
-    def impresion(self, valor):
-        tipo = type(valor[0]) 
-   
-        print(self.dentroIf, self.Condicion, self.dentroElse)
-        if self.dentroIf == True and self.Condicion == True and self.dentroElse == False:
-            Impresion().ejecutar(self, valor)
-        elif self.dentroIf == False and self.dentroElse == False:
-            Impresion().ejecutar(self, valor)
-        elif self.dentroIf == True and self.Condicion == False and self.dentroElse == True:
-             Impresion().ejecutar(self, valor)
+    def impresion(self, valor): 
+        #print(self.dentroIf, self.Condicion, self.dentroElse) -> linea de codigo que hace test a centinelas
+        if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
+            Action().executePrint(self, valor)
         
     def declarar(self, valor):
         tipo = str(valor[0])
         nombre = str(valor[1])
         
         try:
-            if  self.tableSymbol[nombre]:
-                print(f"Error linea-{ valor[0].line} La variable <{nombre}> ya ha sido declarada")
+            if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
+                if  self.tableSymbol[nombre]:
+                    print(f"Error linea-{ valor[0].line} La variable <{nombre}> ya ha sido declarada")
         except KeyError:
             if len(valor) > 2:
                 variable = valor[2]
@@ -110,17 +108,17 @@ class T(Transformer):
         variableType = self.tableSymbol[variable]
         tipo = variableType["tipo"]
 
-        if variableType["tipo"] == "int" and isinstance(expresion, int): 
-            self.variables[variable] = expresion
-        elif variableType["tipo"] == "float" and isinstance(expresion, float):
-            self.variables[variable] = expresion
-        elif variableType["tipo"] == "string" and isinstance(expresion, str):
-            self.variables[variable] = expresion
-        elif variableType["tipo"] == "bool" and isinstance(expresion, bool):
-            self.variables[variable] = expresion
-        else:
-            print(f"Error linea {valor[0].line} no se puede asignar \"{expresion}\" a la variable \"{variable}\"")
-       
+        if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
+            if variableType["tipo"] == "int" and isinstance(expresion, int): 
+                self.variables[variable] = expresion
+            elif variableType["tipo"] == "float" and isinstance(expresion, float):
+                self.variables[variable] = expresion
+            elif variableType["tipo"] == "string" and isinstance(expresion, str):
+                self.variables[variable] = expresion
+            elif variableType["tipo"] == "bool" and isinstance(expresion, bool):
+                self.variables[variable] = expresion
+            else:
+                print(f"Error linea {valor[0].line} no se puede asignar \"{expresion}\" a la variable \"{variable}\"")
         return valor
     
     #///////////////////////////////hasta aqui funciona
@@ -230,7 +228,6 @@ class T(Transformer):
         return resultado
     
     def expresion(self, valor):
-       # print("expresion->" , valor)
         if valor[0] in self.variables and (isinstance(self.variables[valor[0]], int) or isinstance(self.variables[valor[0]], float)):
             resultado = self.variables[valor[0]]
         else: 
@@ -272,13 +269,19 @@ class T(Transformer):
        #validamos si existe el nombre de la variable y lo asignamos a la variable existen   
         return resultado
 
-# //////////////////////////////////////////////////////////////
-class Impresion(Transformer):
-    """def __init__(self, valor):
-        valor = valor
-        self.variables = self
-    """
-    def ejecutar(selfNew, self, valor):
+#--------------------------------------------------------------------------------------
+class Action(Transformer):
+    def validatorExpresion(self, dentroIf, Condicion, dentroElse):
+        if dentroIf == True and Condicion == True and dentroElse == False:
+            return True
+        elif dentroIf == False and dentroElse == False:
+            return True
+        elif dentroIf == True and Condicion == False and dentroElse == True:
+             return True
+        return False
+    
+    # borrar el texto concadenado al print
+    def executePrint(selfNew, self, valor):
         tipo = type(valor[0]) 
         try:
             if str(valor[0]).find("\"")>=0:
@@ -290,8 +293,8 @@ class Impresion(Transformer):
             else:
                 print(f"Error de impresion linea-{valor[0].line} la variable <{valor[0]}> no existe")
         except KeyError:
-                print("La variable no ha sido declarada")
-# //////////////////////////////////////////////////////////////
+                print("La variable no ha sido declarada")            
+#--------------------------------------------------------------------------------------
 
 with open('../Gramatica/grammar.Lark', 'r') as f:
     grammar = f.read()
@@ -300,16 +303,17 @@ entrada ="""/* esto es un comentario */
     int edad = 3;
     out(edad);
 
-    if(3<4){
+    if(3>4){
         string name = "entre";
         out(name);
     }else{
         out(edad);
     };
-    
-    Tree()
     """
-#$prinTable()$
+"""
+Tree()
+$prinTable()$
+"""
 
-parser = Lark(grammar, parser='lalr', transformer = T())
+parser = Lark(grammar, parser='lalr', transformer = T(grammar, entrada))
 parser.parse(entrada)
