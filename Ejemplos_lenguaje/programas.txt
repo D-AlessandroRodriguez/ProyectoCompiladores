@@ -8,3 +8,10 @@
     out(edad);
     Tree()
     $prinTable()$
+
+        if(3>4){
+        string name = "entre";
+        out(name);
+    }else{
+        out(edad);
+    };
