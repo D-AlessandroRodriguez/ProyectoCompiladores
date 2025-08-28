@@ -14,7 +14,7 @@ class T(Transformer):
     Args:
         Transformer (_type_): Hereda de Transformer para manejo de cada no
     """
-    def __init__(self, grammar, inputSentence):
+    def __init__(self):
         """_summary_
 
         Args:
@@ -24,12 +24,10 @@ class T(Transformer):
         super(). __init__()
         self.variables = {}
         self.tableSymbol = {}
-        self.grammar = grammar
-        self.inputSentence = inputSentence
         self.dentroIf = False
         self.dentroElse = False
         self.Condicion = False
-
+    
     def entero(self, valor):
         return int(valor[0])
     
@@ -71,8 +69,9 @@ class T(Transformer):
         return valor[0]
     
     def TREE(self, valor):
-        print(Lark(self.grammar, parser="lalr").parse(self.inputSentence).pretty())
-
+        #print(Lark(self.grammar, parser="lalr").parse(self.inputSentence).pretty())
+        return valor
+    
     def impresion(self, valor): 
         if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
             Action().executePrint(self, valor)
@@ -284,35 +283,12 @@ class Action(Transformer):
         tipo = type(valor[0]) 
         try:
             if str(valor[0]).find("\"")>=0:
-                print("impresion cadena->",valor[0])
+                print(valor[0]) #impresion cadena
             elif tipo == int or tipo == float or tipo == bool:
-                print("impresion numero->", valor[0])
+                print(valor[0]) #impresion numero
             elif self.variables.get(valor[0]) != None:
-                print("impresion variable->",self.variables.get(valor[0]))
+                print(self.variables.get(valor[0])) #impresion variable
             else:
                 print(f"Error de impresion linea-{valor[0].line} la variable <{valor[0]}> no existe")
         except KeyError:
                 print("La variable no ha sido declarada")            
-#--------------------------------------------------------------------------------------
-
-with open('../Gramatica/grammar.Lark', 'r') as f:
-    grammar = f.read()
-
-entrada ="""/* esto es un comentario */
-    int edad = 3;
-    out(edad);
-
-    if(3>4){
-        string name = "entre";
-        out(name);
-    }else{
-        out(edad);
-    };
-    """
-"""
-Tree()
-$prinTable()$
-"""
-
-parser = Lark(grammar, parser='lalr', transformer = T(grammar, entrada))
-parser.parse(entrada)

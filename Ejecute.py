@@ -11,7 +11,7 @@ with open('Gramatica/grammar.Lark', 'r') as f:
 with open('Ejemplos_lenguaje/programas.txt', 'r') as d:
     programa = d.read()
 
-interprete = Interpretador(grammar,programa)
+interprete = Interpretador(grammar)
 options = input("Como desea programar:\n1. Desde consola\n2. cargar un programa .txt\n3. salir\n>> ")
 while(True):
     if options == "1":
