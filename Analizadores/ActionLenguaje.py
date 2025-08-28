@@ -1,9 +1,10 @@
 from lark import Lark
 from Analizadores.transformer import T
-import os
-
+"""
+    Módulo que hace uso del transfor para ejecutar las instrucciones    
+"""
 class Interpretador:
-    def __init__(self, grammar,programa):
+    def __init__(self, grammar, programa):
         self.Sentence = []
         self.grammar = grammar
         self.programa = programa

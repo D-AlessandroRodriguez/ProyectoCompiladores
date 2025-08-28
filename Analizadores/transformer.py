@@ -1,21 +1,35 @@
 from lark import Lark, Transformer, Token
 import re
+"""
+Módulo que se encarga de manejar el árbol generado por la gramática en lark usando Transformer
+haciendo cada acción cuando se detecta en la gramatica. La logica aplica no funciona para anidación
+para esto se debe primero analizar el arbol y despues ejecutar
 
+fecha:
+version: 0.1.9
+"""
 class T(Transformer):
+    """
+    Objeto T que se hereda de Transformer para manejar el árbol creado por Lark
+    Args:
+        Transformer (_type_): Hereda de Transformer para manejo de cada no
+    """
     def __init__(self, grammar, inputSentence):
+        """_summary_
+
+        Args:
+            grammar (_type_): gramatica para procesar y generar el arbol
+            inputSentence (_type_): es la entrada en texto que procesara la gramática
+        """
         super(). __init__()
-        #diccionarios
         self.variables = {}
         self.tableSymbol = {}
-        #gramatica
         self.grammar = grammar
         self.inputSentence = inputSentence
-        #centinelas
         self.dentroIf = False
         self.dentroElse = False
         self.Condicion = False
 
-    #//////////Extras////////////
     def entero(self, valor):
         return int(valor[0])
     
@@ -36,10 +50,7 @@ class T(Transformer):
     
     def termino(self, valor):
        return valor
-    # /////////////////////////
 
-
-    #///////////// Métodos para manejar la gramática/////////
     def start(self, valor):
         return valor
     
@@ -57,14 +68,12 @@ class T(Transformer):
         
     
     def instruccion(self, valor):
-        print("print de instruccion->",valor)
         return valor[0]
     
     def TREE(self, valor):
         print(Lark(self.grammar, parser="lalr").parse(self.inputSentence).pretty())
 
     def impresion(self, valor): 
-        #print(self.dentroIf, self.Condicion, self.dentroElse) -> linea de codigo que hace test a centinelas
         if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
             Action().executePrint(self, valor)
         
@@ -121,33 +130,21 @@ class T(Transformer):
                 print(f"Error linea {valor[0].line} no se puede asignar \"{expresion}\" a la variable \"{variable}\"")
         return valor
     
-    #///////////////////////////////hasta aqui funciona
     def decision(self, valor):
         return valor[0]
     
     def ciclo(self, valor):
         return valor[0]
     
-    #////////////////////////////////////////////////////
-    #metodo recursivo para imprimir las sentencias dentro del if
+    #manejo de if
     def ifgrammar(self, valor):
         self.dentroIf = True
 
-    # /////////////Métodos para manejar decisiones ////////////////
     def ifstatement(self, valor):
       return valor
     
-    #esta parte no se ejecutara por los momentos
     def elifparte(self, valor):
-        if not valor: # evitamos que guarde NONE y en cambio envíe una lista vacía
-            print("DEBUG - ELIF: ", valor)
-            return []
-        resultado = []
-        for i in range(0, len(valor), 2):
-            condicion = valor[i]
-            bloque = valor[i + 1]
-            resultado.append((condicion, bloque))
-        return resultado
+        return valor
 
     def elsegrammar(self, valor):
         if self.Condicion == False:
@@ -158,10 +155,8 @@ class T(Transformer):
         if not valor or valor[0] is None: #evitamos que guarde NONE y en cambio envíe una lista vacía
             return []
         return valor[0]  
-  #//////////////////////////////////////////////////////////////
-
-
-  # //////////////Métodos para manejar ciclos///////////////////
+    
+  #Métodos para manejar ciclos no funcionan solo queda implementar
     def forloop(self, valor):
       inicio = valor[0]
       condicion = valor[1]
@@ -193,7 +188,7 @@ class T(Transformer):
                 break
       return None
     
-# ////////////////Metodos de condiciones y operaciones logicas////////////////
+#Metodos de condiciones y operaciones logicas
     def condicion(self, valor):
         def evaluar(v):
             if isinstance(v, Token):
@@ -265,12 +260,16 @@ class T(Transformer):
             elif operador == "*":
                 resultado = resultado * termino
             elif operador == "/":
-                resultado = resultado / termino
-       #validamos si existe el nombre de la variable y lo asignamos a la variable existen   
+                resultado = resultado / termino  
         return resultado
-
 #--------------------------------------------------------------------------------------
 class Action(Transformer):
+    """Método acción que maneja validar la expresion para condicionar el if-else soli ejecute
+       cuando la condicion sea verdadera o falsa el bloque necesario
+
+    Args:
+        Transformer (_type_): hereda igual de Transformer pero para ser usado dentro de class T
+    """
     def validatorExpresion(self, dentroIf, Condicion, dentroElse):
         if dentroIf == True and Condicion == True and dentroElse == False:
             return True
@@ -280,7 +279,7 @@ class Action(Transformer):
              return True
         return False
     
-    # borrar el texto concadenado al print
+    #Ejecuta el print pero lo valida según la condición en caso de tener if
     def executePrint(selfNew, self, valor):
         tipo = type(valor[0]) 
         try:
