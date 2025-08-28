@@ -1,4 +1,4 @@
-    /* esto es un comentario */
+    /*esto es un comentario*/
     string nombre = "mundo";
     string saludo = 1 + 3 + 4 + 5 + 6 + "Hola " + nombre + " feliz noche" ;
     out(saludo);
@@ -6,9 +6,5 @@
     out("Hola " + nombre + " feliz noche");
     int edad = 33 - 10.5 - 5.5*1 + (60/2);
     out(edad);
-<<<<<<< HEAD
-    out(1112);$
-=======
-    int todo = 50 + 3 + edad;
-    out(todo);
->>>>>>> 8431da594e69d24726f23e05ad25a58c952532e9
+    Tree()
+    $prinTable()$

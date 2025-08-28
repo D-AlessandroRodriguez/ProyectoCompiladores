@@ -1,0 +1,294 @@
+from lark import Lark, Transformer, Token
+import re
+"""
+Módulo que se encarga de manejar el árbol generado por la gramática en lark usando Transformer
+haciendo cada acción cuando se detecta en la gramatica. La logica aplica no funciona para anidación
+para esto se debe primero analizar el arbol y despues ejecutar
+
+fecha:
+version: 0.1.9
+"""
+class T(Transformer):
+    """
+    Objeto T que se hereda de Transformer para manejar el árbol creado por Lark
+    Args:
+        Transformer (_type_): Hereda de Transformer para manejo de cada no
+    """
+    def __init__(self):
+        """_summary_
+
+        Args:
+            grammar (_type_): gramatica para procesar y generar el arbol
+            inputSentence (_type_): es la entrada en texto que procesara la gramática
+        """
+        super(). __init__()
+        self.variables = {}
+        self.tableSymbol = {}
+        self.dentroIf = False
+        self.dentroElse = False
+        self.Condicion = False
+    
+    def entero(self, valor):
+        return int(valor[0])
+    
+    def decimal(self, valor):
+        return float(valor[0])
+    
+    def booleano(self, valor):
+        return valor[0] == "TRUE"
+    
+    def cadena(self, valor):
+        return str(valor[0])
+    
+    def VARNAME(self, valor):
+        return valor
+    
+    def bloque(self, valor):
+        return valor
+    
+    def termino(self, valor):
+       return valor
+
+    def start(self, valor):
+        return valor
+    
+    def printable(self, valor):
+            print(" " * 37  + "TABLA ")
+            print("-" * 80)
+            print("name", " " * 16, "tipo", " " * 16,"valor", " " * 16, "linea", " " * 16)
+            print("-" * 80)
+            for item in self.tableSymbol.values():
+                for val in item.values():
+                    valor = 22 - len(str(val))
+                    print(val," " * valor,end="")
+                print()
+            print("-" * 80)
+        
+    
+    def instruccion(self, valor):
+        return valor[0]
+    
+    def TREE(self, valor):
+        #print(Lark(self.grammar, parser="lalr").parse(self.inputSentence).pretty())
+        return valor
+    
+    def impresion(self, valor): 
+        if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
+            Action().executePrint(self, valor)
+        
+    def declarar(self, valor):
+        tipo = str(valor[0])
+        nombre = str(valor[1])
+        
+        try:
+            if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
+                if  self.tableSymbol[nombre]:
+                    print(f"Error linea-{ valor[0].line} La variable <{nombre}> ya ha sido declarada")
+        except KeyError:
+            if len(valor) > 2:
+                variable = valor[2]
+                self.tableSymbol[nombre] = (
+                    {
+                    "name": nombre,
+                    "tipo": tipo,
+                    "valor":  valor[2], 
+                    "linea": valor[0].line
+                    }
+                )
+            else:
+                variable = None
+                self.tableSymbol[nombre] = (
+                    {
+                    "name": nombre,
+                    "tipo": tipo,
+                    "valor":  None, 
+                    "linea": valor[0].line
+                    }
+                )
+            self.variables[nombre] = variable
+        return valor
+        
+    
+    def asignacion(self, valor):
+        variable = valor[0]
+        expresion = valor[1]
+        
+        variableType = self.tableSymbol[variable]
+        tipo = variableType["tipo"]
+
+        if Action().validatorExpresion(self.dentroIf, self.Condicion, self.dentroElse):
+            if variableType["tipo"] == "int" and isinstance(expresion, int): 
+                self.variables[variable] = expresion
+            elif variableType["tipo"] == "float" and isinstance(expresion, float):
+                self.variables[variable] = expresion
+            elif variableType["tipo"] == "string" and isinstance(expresion, str):
+                self.variables[variable] = expresion
+            elif variableType["tipo"] == "bool" and isinstance(expresion, bool):
+                self.variables[variable] = expresion
+            else:
+                print(f"Error linea {valor[0].line} no se puede asignar \"{expresion}\" a la variable \"{variable}\"")
+        return valor
+    
+    def decision(self, valor):
+        return valor[0]
+    
+    def ciclo(self, valor):
+        return valor[0]
+    
+    #manejo de if
+    def ifgrammar(self, valor):
+        self.dentroIf = True
+
+    def ifstatement(self, valor):
+      return valor
+    
+    def elifparte(self, valor):
+        return valor
+
+    def elsegrammar(self, valor):
+        if self.Condicion == False:
+            self.dentroElse = True
+        self.Condicion = False
+
+    def elseparte(self, valor):
+        if not valor or valor[0] is None: #evitamos que guarde NONE y en cambio envíe una lista vacía
+            return []
+        return valor[0]  
+    
+  #Métodos para manejar ciclos no funcionan solo queda implementar
+    def forloop(self, valor):
+      inicio = valor[0]
+      condicion = valor[1]
+      incremento = valor[2]
+      bloque = valor[3]
+      while condicion:
+            for instruccion in bloque:
+                instruccion
+            incremento
+            condicion = valor[1]  # reevaluar condición
+      return None
+
+    def whileloop(self, valor):
+      condicion = valor[0]
+      bloque = valor[1]
+      while condicion:
+            for instruccion in bloque:
+                instruccion
+            condicion = valor[0]  # reevaluar condición
+      return None
+
+    def dowhile(self, valor):
+      bloque = valor[0]
+      condicion = valor[1]
+      while True:
+            for instruccion in bloque:
+                instruccion
+            if not condicion:
+                break
+      return None
+    
+#Metodos de condiciones y operaciones logicas
+    def condicion(self, valor):
+        def evaluar(v):
+            if isinstance(v, Token):
+                nombre = str(v)
+                return self.variables.get(nombre, nombre)
+            return v
+
+        resultado = evaluar(bool(valor))
+
+        i = 1
+        while i < len(valor):
+            operador = valor[i]
+            derecho = valor[i + 1]
+            if operador == "==":
+                resultado = resultado == derecho
+            elif operador == "!=":
+                resultado = resultado != derecho
+            elif operador == "<":
+                resultado = resultado < derecho
+            elif operador == ">":
+                resultado = resultado > derecho
+            elif operador == "<=":
+                resultado = resultado <= derecho
+            elif operador == ">=":
+                resultado = resultado >= derecho
+            elif operador in ("&&", "AND"):
+                resultado = resultado and derecho
+            elif operador in ("||", "OR"):
+                resultado = resultado or derecho
+            i += 2
+        self.Condicion = resultado
+        return resultado
+    
+    def expresion(self, valor):
+        if valor[0] in self.variables and (isinstance(self.variables[valor[0]], int) or isinstance(self.variables[valor[0]], float)):
+            resultado = self.variables[valor[0]]
+        else: 
+            resultado = valor[0]
+        for i in range(1, len(valor), 2):
+            operador = valor[i]
+            termino = valor[i + 1]
+            if termino in self.variables and (isinstance(self.variables[termino], int) or isinstance(self.variables[termino], float)):
+                termino = self.variables[termino]
+            if operador == "+":
+                counter = 0
+                for val in valor:
+                    if re.fullmatch(r"((([1-9]([0-9]+)*)|0)\.([0-9]+))|\d+", str(val)) or re.fullmatch(r"\+|\-|\/|\*", str(val)):
+                        counter = counter + 1
+                    elif val in self.variables and (isinstance(self.variables[val], int) or isinstance(self.variables[val], float)):
+                        counter = counter + 1
+                        termino = self.variables[val]
+                    else:
+                        continue
+                
+                if (counter != len(valor)):
+                    # valor tiene almacenado: [val1, "+", val2, "+", val3, ...]
+                    resultado = ""        
+                    for val in valor:
+                        if isinstance(val, str) and val in self.variables:
+                            val = self.variables[val]
+                        elif(val == "+"):
+                            continue
+                        resultado += str(val)  # forzamos a string para concatenar
+
+                else:
+                    resultado = resultado + termino
+            elif operador == "-":
+                resultado = resultado - termino
+            elif operador == "*":
+                resultado = resultado * termino
+            elif operador == "/":
+                resultado = resultado / termino  
+        return resultado
+#--------------------------------------------------------------------------------------
+class Action(Transformer):
+    """Método acción que maneja validar la expresion para condicionar el if-else soli ejecute
+       cuando la condicion sea verdadera o falsa el bloque necesario
+
+    Args:
+        Transformer (_type_): hereda igual de Transformer pero para ser usado dentro de class T
+    """
+    def validatorExpresion(self, dentroIf, Condicion, dentroElse):
+        if dentroIf == True and Condicion == True and dentroElse == False:
+            return True
+        elif dentroIf == False and dentroElse == False:
+            return True
+        elif dentroIf == True and Condicion == False and dentroElse == True:
+             return True
+        return False
+    
+    #Ejecuta el print pero lo valida según la condición en caso de tener if
+    def executePrint(selfNew, self, valor):
+        tipo = type(valor[0]) 
+        try:
+            if str(valor[0]).find("\"")>=0:
+                print(valor[0]) #impresion cadena
+            elif tipo == int or tipo == float or tipo == bool:
+                print(valor[0]) #impresion numero
+            elif self.variables.get(valor[0]) != None:
+                print(self.variables.get(valor[0])) #impresion variable
+            else:
+                print(f"Error de impresion linea-{valor[0].line} la variable <{valor[0]}> no existe")
+        except KeyError:
+                print("La variable no ha sido declarada")            
